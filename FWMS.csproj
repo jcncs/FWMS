@@ -4,4 +4,15 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="wwwroot\umd\**" />
+    <Content Remove="wwwroot\umd\**" />
+    <EmbeddedResource Remove="wwwroot\umd\**" />
+    <None Remove="wwwroot\umd\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Image\" />
+  </ItemGroup>
+
 </Project>
