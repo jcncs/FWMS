@@ -1,21 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Login";
-    Layout = "_LoginLayout";
+    ViewData["Title"] = "Sign In";
 }
 
 <div class="text-center my-auto">
     <div class="container-fluid col-lg-4 col-6">
-        <h1 class="display-5">Login</h1>
+        <h1 class="display-6"><b>Sign in</b></h1>
         <form>
+            <br />
             <div class="form-group">
-                <input class="form-control" placeholder="Enter Username">
+                <input class="form-control" placeholder="Email address">
             </div>
             <br />
             <div class="form-group">
                 <input class="form-control" placeholder="Password">
             </div>
             <br />
-            <button type="submit" class="btn btn-success col-12">Login</button>
+            <div class="form-group">
+                <input id="cbRmbMe" type="checkbox" checked/>
+                <label for="cbRmbMe">Remember me</label>
+            </div>
+            <br />
+            <div class="form-group">
+                <button type="submit" class="btn btn-success col-12">Login</button>
+            </div>
+            <br />
+            <div class="form-group">
+                <a style="float:right; font-size:12px;" asp-area="" asp-controller="Admin" asp-action="ForgetPassword">Forgot Password?</a>
+            </div>
         </form>
     </div>
 </div>

@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Create New Account";
+}
+
+<div class="text-center my-auto">
+    <img src="~/Icons/Add_user_icon_blue.jpg" alt="Add new user" style="height:104px; width:91px;">
+    <h1 class="display-6"><b>Join Us</b></h1>
+    <div class="container-fluid col-lg-4 col-6">
+        Already have an account? <a font-size:12px;" asp-area="" asp-controller="Admin" asp-action="Login">Sign in</a>
+        <form>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Email address">
+            </div>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Username">
+            </div>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Contact number">
+            </div>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Secondary contact number">
+            </div>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Password">
+            </div>
+            <br />
+            <div class="form-group">
+                <input class="form-control" placeholder="Confirm password">
+            </div>
+            <br />
+            <div class="form-group">
+                <input id="cbConsent" type="checkbox" checked />
+                <label for="cbConsent">Consent to allow website to use my info</label>
+            </div>
+            <br />
+            <div class="form-group">
+                <button type="submit" class="btn btn-success col-12">Create My Account</button>
+            </div>
+        </form>
+    </div>
+</div>
