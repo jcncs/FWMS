@@ -10,12 +10,12 @@ using System.Net;
 
 namespace FWMS.Controllers
 {
-    public class DonationsController : Controller
+    public class CollectionsController : Controller
     {
-        private readonly ILogger<DonationsController> _logger;
+        private readonly ILogger<CollectionsController> _logger;
         private readonly IConfiguration _configuration;
 
-        public DonationsController(ILogger<DonationsController> logger, IConfiguration configuration)
+        public CollectionsController(ILogger<CollectionsController> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
@@ -25,7 +25,7 @@ namespace FWMS.Controllers
         {
             string response = string.Empty;
             var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-            var viewDonations = _configuration.GetSection("ViewDonations").Get<string>();
+            var viewDonations = _configuration.GetSection("ViewCollections").Get<string>();
             HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewDonations);
             httpWebRequest.ContentType = "application/json; charset=utf-8";
             httpWebRequest.Method = "GET";
@@ -36,7 +36,7 @@ namespace FWMS.Controllers
                 response = streamReader.ReadToEnd();
             }
             httpResponse.Close();
-            List<ViewDonationsModel> result = Deserialize<List<ViewDonationsModel>>(response);
+            List<ViewCollectionsModel> result = Deserialize<List<ViewCollectionsModel>>(response);
             return View(result);
         }
 

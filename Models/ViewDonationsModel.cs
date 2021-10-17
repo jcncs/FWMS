@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FWMS.Models
 {
-    public class ViewDonationModel
+    public class ViewDonationsModel
     {
         public string donationId { get; set; }
         public string donationName { get; set; }
