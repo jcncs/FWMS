@@ -1,26 +1,43 @@
 ﻿using FWMS.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
+using System.Net;
 
 namespace FWMS.Controllers
 {
     public class DonationsController : Controller
     {
         private readonly ILogger<DonationsController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public DonationsController(ILogger<DonationsController> logger)
+        public DonationsController(ILogger<DonationsController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
         {
-            return View();
+            string response = string.Empty;
+            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+            var viewDonations = _configuration.GetSection("ViewDonations").Get<string>();
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewDonations);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<ViewDonationModel> result = Deserialize<List<ViewDonationModel>>(response);
+            return View(result);
         }
 
         public IActionResult CreateDonation()
@@ -36,6 +53,12 @@ namespace FWMS.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public static T Deserialize<T>(string jsonData)
+        {
+            JsonSerializer json = new JsonSerializer();
+            return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
     }
 }
