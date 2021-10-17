@@ -7,7 +7,7 @@ on:
 
 env:
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  APP_NAME: ${{ 'fwms-net-heroku-app' }}
+  APP_NAME: ${{ 'fwms-heroku' }}
 
 jobs:
   build:
