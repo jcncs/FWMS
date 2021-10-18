@@ -1,7 +1,47 @@
 ﻿@{
     ViewData["Title"] = "Profile";
+    @model ViewProfileModel;
 }
 
-<div class="text-center">
-    <h1 class="display-4">View your Profile</h1>
+<div class="my-auto">
+    <div class="container-fluid col-lg-4 col-6">
+        <h1 class="display-6"><b>View your Profile</b></h1>
+        <br />
+        <div class="row">
+            <div class="col-lg-8 col-8">
+                <label for=""><b>Username</b></label>
+            </div>
+            <div class="col-lg-4 col-4">
+                <label for="">@Model.userName</label>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-8 col-8">
+                <label for=""><b>Email</b></label>
+            </div>
+            <div class="col-lg-4 col-4">
+                <label for="">@Model.email</label>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-8 col-8">
+                <label for=""><b>Contact number</b></label>
+            </div>
+            <div class="col-lg-4 col-4">
+                <label for="">@Model.homePhone</label>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-8 col-8">
+                <label for=""><b>Secondary contact number</b></label>
+            </div>
+            <div class="col-lg-4 col-4">
+                <label for="">@Model.officePhone</label>
+            </div>
+        </div>
+        <br />
+    </div>
 </div>
