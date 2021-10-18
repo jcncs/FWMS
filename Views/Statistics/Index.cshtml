@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Statistics";
+    @model List<ViewStatisticsModel>;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Donor Statistics</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">DonorName</th>
+                <th scope="col">TotalDonationCount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 0;
+                foreach (var item in Model)
+                {
+                    i++;
+                    <tr>
+                        <th scope="row">@i</th>
+                        <td>@item.donorName</td>
+                        <td>@item.totalDonationCount</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

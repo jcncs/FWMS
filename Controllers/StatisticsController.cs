@@ -10,12 +10,12 @@ using System.Net;
 
 namespace FWMS.Controllers
 {
-    public class CollectionsController : Controller
+    public class StatisticsController : Controller
     {
-        private readonly ILogger<CollectionsController> _logger;
+        private readonly ILogger<StatisticsController> _logger;
         private readonly IConfiguration _configuration;
 
-        public CollectionsController(ILogger<CollectionsController> logger, IConfiguration configuration)
+        public StatisticsController(ILogger<StatisticsController> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
@@ -25,8 +25,8 @@ namespace FWMS.Controllers
         {
             string response = string.Empty;
             var apiGateway = _configuration["ApiGateway"];
-            var viewCollectionss = _configuration["Collection:GET:GetAllCollections"];
-            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewCollectionss);
+            var getDonorLeaderboard = _configuration["Statistics:GET:GetDonorLeaderboard"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+getDonorLeaderboard);
             httpWebRequest.ContentType = "application/json; charset=utf-8";
             httpWebRequest.Method = "GET";
             httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
@@ -36,7 +36,7 @@ namespace FWMS.Controllers
                 response = streamReader.ReadToEnd();
             }
             httpResponse.Close();
-            List<ViewCollectionsModel> result = Deserialize<List<ViewCollectionsModel>>(response);
+            List<ViewStatisticsModel> result = Deserialize<List<ViewStatisticsModel>>(response);
             return View(result);
         }
 

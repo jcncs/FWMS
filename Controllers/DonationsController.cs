@@ -24,8 +24,8 @@ namespace FWMS.Controllers
         public IActionResult Index()
         {
             string response = string.Empty;
-            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-            var viewDonations = _configuration.GetSection("ViewDonations").Get<string>();
+            var apiGateway = _configuration["ApiGateway"];
+            var viewDonations = _configuration["Donation:GET:ViewDonations"];
             HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewDonations);
             httpWebRequest.ContentType = "application/json; charset=utf-8";
             httpWebRequest.Method = "GET";
