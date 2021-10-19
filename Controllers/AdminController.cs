@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using System.IO;
@@ -19,6 +19,8 @@ namespace FWMS.Controllers
         private const string FailedAuthentication = "Could not authenticate user.";
 
         private const string AUTHORIZATION = "Authorization";
+        private const string ROLE = "Role";
+        private const string USERID = "UserID";
         public AdminController(ILogger<AdminController> logger, IConfiguration configuration)
         {
             _logger = logger;
@@ -85,6 +87,10 @@ namespace FWMS.Controllers
                     {
                         var resultVerifyjson = JsonConvert.DeserializeObject(responseTwo).ToString();
                     }
+                    else
+                    {
+                        HttpContext.Session.SetString(ROLE, "1");
+                    }
 
                 }
                 else 
@@ -99,24 +105,8 @@ namespace FWMS.Controllers
             return ViewBag.ErrorMessage == null ? RedirectToAction("Index","Dashboard") : View("Login", model);
         }
         public IActionResult Profile()
-        {
-            string userId = "1";
-            string response = string.Empty;
-            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-            var viewMyProfile = _configuration.GetSection("Authentication:GET:ViewMyProfile").Get<string>();
-            viewMyProfile = viewMyProfile.Replace("{userId}", "1");
-            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewMyProfile);
-            httpWebRequest.ContentType = "application/json; charset=utf-8";
-            httpWebRequest.Method = "GET";
-            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-            {
-                response = streamReader.ReadToEnd();
-            }
-            httpResponse.Close();
-            ViewProfileModel result = Deserialize<ViewProfileModel>(response);
-            return View(result);
+        { 
+            return View(RetrieveProfile("1"));
         }
 
         public IActionResult ForgetPassword()
@@ -129,16 +119,49 @@ namespace FWMS.Controllers
             return View();
         }
 
+        public IActionResult Logout()
+        {
+            var currentrole = HttpContext.Session.GetString(ROLE);
+            if (!(string.IsNullOrWhiteSpace(currentrole)))
+            {
+                HttpContext.Session.Remove(ROLE);
+                HttpContext.Session.Clear();
+            }
+            return View("Login");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        #region functions
         public static T Deserialize<T>(string jsonData)
         {
             JsonSerializer json = new JsonSerializer();
             return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
+        private ViewProfileModel RetrieveProfile(string userId)
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+            var viewMyProfile = _configuration.GetSection("Authentication:GET:ViewMyProfile").Get<string>();
+            viewMyProfile = viewMyProfile.Replace("{userId}", userId);
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + viewMyProfile);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            ViewProfileModel result = Deserialize<ViewProfileModel>(response);
+
+            return result;
+        }
+        #endregion
     }
 }
