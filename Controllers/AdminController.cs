@@ -123,6 +123,42 @@ namespace FWMS.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult ForgetPassword(ForgetPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (IsValidEmail(model.email))
+                {
+                    string response = string.Empty;
+                    var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                    var sendemail = _configuration.GetSection("Notification:POST:SendEmail").Get<string>();
+                    var postData = "ToEmail=" + model.email;
+                    postData += "&Subject=Reset Password";
+                    postData += "&Body=Kindly use this password to go to the change password page.";
+                    var data = Encoding.ASCII.GetBytes(postData);
+                    HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + sendemail);
+                    httpWebRequest.Method = "POST";
+                    httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                    httpWebRequest.ContentLength = data.Length;
+                    using (var stream = httpWebRequest.GetRequestStream())
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                    var responseString = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
+                }
+                else 
+                {
+                    ViewBag.ErrorMessage = "Please a valid email.";
+                }
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Please enter your email.";
+            }
+            return ViewBag.ErrorMessage == null ? View("Login") : View("ForgetPassword");
+        }
         public IActionResult CreateNewAccount()
         {
             return View();
@@ -153,7 +189,22 @@ namespace FWMS.Controllers
             JsonSerializer json = new JsonSerializer();
             return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
-
+        private static bool IsValidEmail(string email)
+        {
+            if (email.Trim().EndsWith("."))
+            {
+                return false; // suggested by @TK-421
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private ViewProfileModel RetrieveProfile(string userId)
         {
             string response = string.Empty;
