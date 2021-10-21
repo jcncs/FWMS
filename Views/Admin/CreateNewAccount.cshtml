@@ -25,16 +25,20 @@
             </div>
             <br />
             <div class="form-group">
-                <input class="form-control" placeholder="Password">
+                <input type="password" class="form-control" placeholder="Password" id="pwdHash">
             </div>
             <br />
             <div class="form-group">
-                <input class="form-control" placeholder="Confirm password">
+                <input type="password" class="form-control" placeholder="Confirm password">
             </div>
             <br />
             <div class="form-group">
-                <input id="cbConsent" type="checkbox" />
+                <input id="cbConsent" type="checkbox" checked />
                 <label for="cbConsent">Consent to allow website to use my info</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" onclick="showPassword()" />
+                <label>Show Password</label>
             </div>
             <br />
             <div class="form-group">
@@ -43,3 +47,13 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    function showPassword() {
+        var x = document.getElementById("pwdHash");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>

@@ -5,6 +5,11 @@
 
 <div class="text-center">
     <h1 class="display-6"><b>Donor Statistics</b></h1>
+    <div class="d-flex justify-content-center">
+        <div style="width: 500px; height: 300px;">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
 
     <table class="table">
         <thead>
@@ -25,8 +30,33 @@
                         <td>@item.donorName</td>
                         <td>@item.totalDonationCount</td>
                     </tr>
+
                 }
+                //ViewBag.Data = string.Join(",", Model.Select(e => e.totalDonationCount));
+                //ViewBag.Label = string.Join(",", Model.Select(e => $"'{e.donorName}'"));
             }
         </tbody>
     </table>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = [@Html.Raw(string.Join(",", Model.Select(e => $"'{e.donorName}'")))];
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Donor Leaderboard',
+            backgroundColor: 'rgb(99, 132, 255)',
+            borderColor: 'rgb(99, 132, 255)',
+            data: [@string.Join(",", Model.Select(e => e.totalDonationCount))],
+        }]
+    };
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {}
+    };
+    var myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+    );
+</script>
