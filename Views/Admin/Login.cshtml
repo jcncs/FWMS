@@ -12,29 +12,35 @@
         </div>
         @using (Html.BeginForm("Login", "Admin", FormMethod.Post))
         {
-            <form>
-                <div class="form-group">
-                    <input class="form-control" placeholder="Username" name="userName" id="userName">
-                </div>
-                <br />
-                <div class="form-group">
-                    <input class="form-control" placeholder="Password" name="pwdHash" id="pwdHash">
-                </div>
-                <br />
-                <div class="form-group">
-                    <input id="cbRmbMe" type="checkbox" checked />
-                    <label for="cbRmbMe">Remember me</label>
-                </div>
-                <br />
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success col-12">Login</button>
-                </div>
-                <br />
-                <div class="form-group">
-                    <a style="float:right; font-size:12px;" asp-area="" asp-controller="Admin" asp-action="ForgetPassword">Forgot Password?</a>
-                </div>
-            </form>
+    <form>
+        <div class="form-group">
+            <input class="form-control" placeholder="Username" name="userName" id="userName">
+        </div>
+        <br />
+        <div class="form-group">
+            <input class="form-control" placeholder="Password" name="pwdHash" id="pwdHash">
+        </div>
+        <br />
+        <div class="form-group">
+            <input id="cbRmbMe" type="checkbox" />
+            <label for="cbRmbMe">Remember me</label>
+        </div>
+        <br />
+        <div class="form-group">
+            <button type="submit" class="btn btn-success col-12">Login</button>
+        </div>
+        <br />
+        <br />
+        <div class="form-group">
+            <a style="text-decoration:none;color:#212529" asp-area="" asp-controller="Admin" asp-action="ForgetPassword">I forgot my password</a>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="newacc">Don't have an account?</label>&nbsp;<a style="text-decoration:none;color:#2E77AE;" asp-area="" asp-controller="Admin" asp-action="CreateNewAccount">Create account</a>
+        </div>
+    </form>
         }
     </div>
+
 </div>
 

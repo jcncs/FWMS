@@ -30,13 +30,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About">ABOUT</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">DASHBOARD</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Profile">PROFILE</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="Index">DONATIONS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Collections" asp-action="Index">COLLECTIONS</a>
+                        </li>
                     </ul>
                 </div>
                 <form class="form-inline my-4 my-lg-2">
                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                         <ul class="navbar-nav flex-grow-1">
                             <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Login">SIGN IN</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Logout">LOGOUT</a>
                             </li>
                         </ul>
                     </div>
@@ -62,3 +74,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

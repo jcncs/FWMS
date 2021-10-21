@@ -1,14 +1,24 @@
 ﻿@using Microsoft.AspNetCore.Http;
 @{
-    var currentrole = Context.Session.GetString("Role");
-    var role = new List<string> { "1", "2", "3", "4" };
+    var currentrole = string.IsNullOrWhiteSpace(Context.Session.GetString("Role"))? 0: int.Parse(Context.Session.GetString("Role"));
 
-    if (role.Contains(currentrole))
+    switch (currentrole)
     {
-        Layout = "_AdminLayout";
-    }
-    else
-    {
-        Layout = "_Layout";
+        case 0://public
+            Layout = "_Layout";
+            break;
+        case 1://admin
+            Layout = "_AdminLayout";
+            break;
+        case 2://public
+            Layout = "_Layout";
+            break;
+        case 3://collector
+            Layout = "_CollectorLayout";
+            break;
+        case 4://Donor
+            Layout = "_DonorLayout";
+            break;
+
     }
 }

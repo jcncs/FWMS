@@ -7,6 +7,8 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using System.Text;
+using System;
 
 namespace FWMS.Controllers
 {
@@ -21,6 +23,7 @@ namespace FWMS.Controllers
         private const string AUTHORIZATION = "Authorization";
         private const string ROLE = "Role";
         private const string USERID = "UserID";
+        private const string USERNAME = "Username";
         public AdminController(ILogger<AdminController> logger, IConfiguration configuration)
         {
             _logger = logger;
@@ -73,25 +76,29 @@ namespace FWMS.Controllers
                     HttpWebRequest httpWebRequestVerify = (HttpWebRequest)WebRequest.Create(apiGateway + verify);
                     httpWebRequestVerify.ContentType = "application/json; charset=utf-8";
                     httpWebRequestVerify.Method = "GET";
-                    httpWebRequestVerify.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                    //httpWebRequestVerify.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
                     httpWebRequestVerify.Headers.Add(AUTHORIZATION, "Bearer " + resultLoginjson);
 
                     HttpWebResponse httpResponseVerify = (HttpWebResponse)httpWebRequestVerify.GetResponse();
-                    using (StreamReader streamReader = new StreamReader(httpResponseVerify.GetResponseStream()))
+
+                    using (StreamReader streamReadertwo= new StreamReader(httpResponseVerify.GetResponseStream()))
                     {
-                        responseTwo = streamReader.ReadToEnd();
+                        responseTwo = streamReadertwo.ReadToEnd();
                     }
+
                     httpResponseVerify.Close();
 
                     if (!(string.IsNullOrWhiteSpace(responseTwo)))
                     {
-                        var resultVerifyjson = JsonConvert.DeserializeObject(responseTwo).ToString();
+                        ViewBag.ErrorMessage = "The username or password is incorrect.";
                     }
-                    else
+                    else 
                     {
-                        HttpContext.Session.SetString(ROLE, "1");
+                        LoginUserInfoModel resultUserInfo = RetrieveUserInfo(model.userName);
+                        HttpContext.Session.SetString(ROLE, resultUserInfo.roleId);
+                        HttpContext.Session.SetString(USERNAME, resultUserInfo.userName);
+                        HttpContext.Session.SetString(USERID, resultUserInfo.userId);
                     }
-
                 }
                 else 
                 {
@@ -102,11 +109,13 @@ namespace FWMS.Controllers
             {
                 ViewBag.ErrorMessage =  "Please enter your username and password.";
             }
+
             return ViewBag.ErrorMessage == null ? RedirectToAction("Index","Dashboard") : View("Login", model);
         }
         public IActionResult Profile()
-        { 
-            return View(RetrieveProfile("1"));
+        {
+            string userid = String.IsNullOrWhiteSpace(HttpContext.Session.GetString(USERID))? "": HttpContext.Session.GetString(USERID);
+            return View(RetrieveProfile(userid));
         }
 
         public IActionResult ForgetPassword()
@@ -125,6 +134,8 @@ namespace FWMS.Controllers
             if (!(string.IsNullOrWhiteSpace(currentrole)))
             {
                 HttpContext.Session.Remove(ROLE);
+                HttpContext.Session.Remove(USERNAME);
+                HttpContext.Session.Remove(USERID);
                 HttpContext.Session.Clear();
             }
             return View("Login");
@@ -142,6 +153,7 @@ namespace FWMS.Controllers
             JsonSerializer json = new JsonSerializer();
             return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
+
         private ViewProfileModel RetrieveProfile(string userId)
         {
             string response = string.Empty;
@@ -159,6 +171,26 @@ namespace FWMS.Controllers
             }
             httpResponse.Close();
             ViewProfileModel result = Deserialize<ViewProfileModel>(response);
+
+            return result;
+        }
+        private LoginUserInfoModel RetrieveUserInfo(string username)
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+            var loginUserInfo = _configuration.GetSection("Authentication:GET:GetUserByUsername").Get<string>();
+            loginUserInfo = loginUserInfo.Replace("{username}", username);
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + loginUserInfo);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            LoginUserInfoModel result = Deserialize<LoginUserInfoModel>(response);
 
             return result;
         }
