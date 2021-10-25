@@ -193,7 +193,7 @@ namespace FWMS.Controllers
         {
             if (email.Trim().EndsWith("."))
             {
-                return false; // suggested by @TK-421
+                return false;
             }
             try
             {

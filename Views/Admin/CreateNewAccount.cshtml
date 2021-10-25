@@ -24,21 +24,19 @@
                 <input class="form-control" placeholder="Secondary contact number">
             </div>
             <br />
-            <div class="form-group">
+            <div class="form-group icon-div">
                 <input type="password" class="form-control" placeholder="Password" id="pwdHash">
+                <i onclick="show('pwdHash')" class="fas fa-eye-slash" id="display"></i>
             </div>
             <br />
-            <div class="form-group">
-                <input type="password" class="form-control" placeholder="Confirm password">
+            <div class="form-group icon-div">
+                <input type="password" class="form-control" placeholder="Confirm password" id="cmfHash">
+                <i onclick="show('cmfHash')" class="fas fa-eye-slash" id="display"></i>
             </div>
             <br />
             <div class="form-group">
                 <input id="cbConsent" type="checkbox"/>
                 <label for="cbConsent">Consent to allow website to use my info</label>
-            </div>
-            <div class="form-group">
-                <input type="checkbox" onclick="showPassword()" />
-                <label>Show Password</label>
             </div>
             <br />
             <div class="form-group">
@@ -48,12 +46,19 @@
     </div>
 </div>
 <script type="text/javascript">
-    function showPassword() {
-        var x = document.getElementById("pwdHash");
-        if (x.type === "password") {
-            x.type = "text";
+    function show(a) {
+        var x = document.getElementById(a);
+        var c = x.nextElementSibling
+        if (x.getAttribute('type') == "password") {
+            c.removeAttribute("class");
+            c.setAttribute("class", "fas fa-eye");
+            x.removeAttribute("type");
+            x.setAttribute("type", "text");
         } else {
-            x.type = "password";
+            x.removeAttribute("type");
+            x.setAttribute('type', 'password');
+            c.removeAttribute("class");
+            c.setAttribute("class", "fas fa-eye-slash");
         }
     }
 </script>
