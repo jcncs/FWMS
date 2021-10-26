@@ -1,0 +1,69 @@
+﻿@model FWMS.Models.RegisterViewModel
+
+<div class="text-center my-auto">
+    <img src="~/Icons/Add_user_icon_blue.jpg" alt="Add new user" style="height:104px; width:91px;">
+    <h1 class="display-6"><b>Join Us</b></h1>
+    <div class="container-fluid col-lg-4 col-6">
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                @*<label asp-for="Email" class="control-label"></label>*@
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                @*<label asp-for="Username" class="control-label"></label>*@
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                @*<label asp-for="ContractNumber" class="control-label"></label>*@
+                <input asp-for="ContractNumber" class="form-control" />
+                <span asp-validation-for="ContractNumber" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                @*<label asp-for="SecContractNumber" class="control-label"></label>*@
+                <input asp-for="SecContractNumber" class="form-control" />
+                <span asp-validation-for="SecContractNumber" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="editor-field">
+                @Html.DropDownList("RoleDown", ViewBag.Roles as SelectList, "Select Role")
+            </div>
+            <br />
+            <div class="form-group">
+                @*<label asp-for="Password" class="control-label"></label>*@
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                @*<label asp-for="ConfirmPassword" class="control-label"></label>*@
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}
+<script type="text/javascript">
+    function showPassword() {
+        var x = document.getElementById("pwdHash");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>

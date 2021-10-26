@@ -9,6 +9,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FWMS.Controllers
 {
@@ -164,6 +167,79 @@ namespace FWMS.Controllers
             return View();
         }
 
+        public IActionResult Register()
+        
+        {
+            //
+            List<Roles> DropDownRole = RetrieveRoles();
+            //Remove admin list;
+            Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
+            //Get than remove;
+            DropDownRole.Remove(AdminRole);
+
+            //Create dropdown list
+            ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
+
+
+            return View();
+        }
+        // POST: /Account/Register
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                string responseOne = string.Empty;
+                var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                var create = _configuration.GetSection("Authentication:POST:CreateUser").Get<string>();
+                HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
+                httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
+                httpWebRequestCreateUser.Method = "POST";
+                httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
+                {
+                    RegisterClass registerclass = new RegisterClass()
+                    {
+                        UserName = model.Username,
+                        PwdHash = model.Password,
+                        Email = model.Email,
+                        HomePhone = model.ContractNumber,
+                        OfficePhone = model.SecContractNumber,
+                        CreatedBy = model.Username,
+                        roleName = model.RoleDown
+                    };
+                    string json = JsonConvert.SerializeObject(registerclass);
+
+                    streamWriter.Write(json);
+                }
+
+                HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
+                using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+                {
+                    responseOne = streamReader.ReadToEnd();
+                }
+                httpResponseCreateUser.Close();
+                if (responseOne.Equals("Username already exist"))
+                {
+                    ModelState.AddModelError("", "Username already exist");
+                    //Get back dropdown
+                    List<Roles> DropDownRole = RetrieveRoles();
+                    //Remove admin list;
+                    Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
+                    //Get than remove;
+                    DropDownRole.Remove(AdminRole);
+                    //Create dropdown list
+                    ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction("index", "login");
+        }
+
+
+
         public IActionResult Logout()
         {
             var currentrole = HttpContext.Session.GetString(ROLE);
@@ -246,5 +322,60 @@ namespace FWMS.Controllers
             return result;
         }
         #endregion
+        private List<Roles> RetrieveRoles()
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var ViewRole = _configuration["Authentication:GET:GetAllRoles"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + ViewRole);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<Roles> result = Deserialize<List<Roles>>(response);
+            return result;
+        }
+        private string CreateUser(RegisterViewModel model)
+        {
+            string responseOne = string.Empty;
+            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+            var create = _configuration.GetSection("Authentication:POST:CreateUser").Get<string>();
+            HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
+            httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
+            httpWebRequestCreateUser.Method = "POST";
+            httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
+            {
+                RegisterClass registerclass = new RegisterClass() { 
+                           UserName =model.Username,
+                            PwdHash =model.Password,
+                             Email =model.Email,
+                            HomePhone =model.ContractNumber,
+                            OfficePhone=model.SecContractNumber,
+                            CreatedBy=model.Username,
+                            roleName=model.RoleDown
+                };
+                string json = JsonConvert.SerializeObject(registerclass);
+
+                streamWriter.Write(json);
+            }
+
+            HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+            {
+                responseOne = streamReader.ReadToEnd();
+            }
+            httpResponseCreateUser.Close();
+
+            var resultLoginjson = JsonConvert.DeserializeObject(responseOne).ToString();
+
+            return "ok";
+        }
+
     }
 }
