@@ -170,12 +170,9 @@ namespace FWMS.Controllers
         public IActionResult Register()
         
         {
-            //
-            List<Roles> DropDownRole = RetrieveRoles();
-            //Remove admin list;
-            Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
-            //Get than remove;
-            DropDownRole.Remove(AdminRole);
+            //check if current user is equal to admin
+            
+            List<UserProfileModel> DropDownRole = RetrieveAllUser();
 
             //Create dropdown list
             ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
@@ -238,7 +235,16 @@ namespace FWMS.Controllers
             return RedirectToAction("index", "login");
         }
 
+        public IActionResult GetAllUser ()
 
+        {
+            //
+            List<UserProfileModel> DropDownRole = RetrieveAllUser();
+            //Remove admin list;
+
+
+            return View(DropDownRole);
+        }
 
         public IActionResult Logout()
         {
@@ -340,6 +346,26 @@ namespace FWMS.Controllers
             List<Roles> result = Deserialize<List<Roles>>(response);
             return result;
         }
+
+        private List<UserProfileModel> RetrieveAllUser()
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var ViewRole = _configuration["Authentication:GET:GetAllUser"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + ViewRole);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<UserProfileModel> result = Deserialize<List<UserProfileModel>>(response);
+            return result;
+        }
+
         private string CreateUser(RegisterViewModel model)
         {
             string responseOne = string.Empty;

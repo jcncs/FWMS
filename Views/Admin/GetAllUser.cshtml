@@ -1,0 +1,70 @@
+﻿@model IEnumerable<FWMS.Models.UserProfileModel>
+@{
+    ViewBag.Title = "Index";
+    int sno = 1;
+}
+<p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HomePhone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OfficePhone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAccountDisabled)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoleName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @sno
+                @{sno++;}
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HomePhone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OfficePhone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+        @if(item.IsAccountDisabled.Equals(0)){
+        <input type="checkbox" id="1" name="disable" value="0" checked disabled READONLY>
+        }else{
+        <input type="checkbox" id="2" name="disable" value="1"  disabled READONLY>
+        }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoleName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id= item.UserId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
