@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Create Donation";
+    @model CreateDonationModel;
+}
+
+<div class="text-center my-auto">
+    <div class="container-fluid col-lg-4 col-6">
+        <h1 class="display-6"><b>New Donation</b></h1>
+        <br />
+        <div class="alert alert-danger" style="@(@ViewBag.ErrorMessage == null? "display:none": "display:block")">
+            <p>@ViewBag.ErrorMessage</p>
+        </div>
+        @using (Html.BeginForm("CreateDonation", "Donations", FormMethod.Post))
+        {
+    <form>
+        <div class="form-group">
+            <input class="form-control" placeholder="Donation Name" name="donationName" id="donationName">
+        </div>
+        <br />
+        <div class="form-group">
+            <input class="form-control" placeholder="Quantity" name="quantity" id="quantity">
+        </div>
+        <br />
+        @*<div class="form-group">
+            <div class='input-group date' id='datetimepicker1'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>*@
+        <br />
+        <div class="form-group">
+            @Html.DropDownListFor(m => m.LocationId,
+                             new SelectList(Model.LocationList, "locationId", "locationName"),
+                             "Select location")
+        </div>
+        <br />
+        <div class="form-group">
+            @Html.DropDownListFor(m => m.FoodId,
+                             new SelectList(Model.FoodDescriptionList, "foodId", "description"),
+                             "Select food")
+        </div>
+        <br />
+        <br />
+        <div class="form-group">
+            <button type="submit" class="btn btn-success col-12">Create</button>
+        </div>
+        <br />
+    </form>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker();
+    });
+</script>

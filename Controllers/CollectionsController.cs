@@ -55,10 +55,51 @@ namespace FWMS.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        #region functions
         public static T Deserialize<T>(string jsonData)
         {
             JsonSerializer json = new JsonSerializer();
             return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
+
+        public List<ViewLocationsModel> LocationList()
+        {
+
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var viewLocations = _configuration["Collection:GET:GetLocationList"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + viewLocations);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<ViewLocationsModel> result = Deserialize<List<ViewLocationsModel>>(response);
+            return result;
+        }
+        public List<ViewFoodDescriptionsModel> FoodDescriptionList()
+        {
+
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var viewFoodDescriptions = _configuration["Collection:GET:GetFoodDescList"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + viewFoodDescriptions);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<ViewFoodDescriptionsModel> result = Deserialize<List<ViewFoodDescriptionsModel>>(response);
+            return result;
+        }
+    #endregion
     }
 }
