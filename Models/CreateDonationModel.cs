@@ -28,7 +28,6 @@ namespace FWMS.Models
         [Required]
         public string FoodId { get; set; }
 
-        [Required]
         public string UserId { get; set; }
     }
 }
