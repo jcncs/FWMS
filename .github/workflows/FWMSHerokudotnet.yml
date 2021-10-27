@@ -1,4 +1,4 @@
-﻿name: Deploy to Heroku
+name: Deploy to Heroku
 
 on:
   push:
@@ -28,3 +28,14 @@ jobs:
       run: |
         heroku container:push web -a $APP_NAME
         heroku container:release web -a $APP_NAME
+
+  ping:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: PING - Dispatch initiating repository event
+      run: |
+        curl -X POST https://api.github.com/jcncs/FWMS_Tests/dispatches \
+        -H 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.FWMS_ACCESS_TOKEN }} \
+        --data '{"event_type": "ping", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
