@@ -60,8 +60,19 @@ namespace FWMS.Controllers
         [HttpPost]
         public ActionResult CreateDonation(CreateDonationModel model)
         {
-            if (!ModelState.IsValid)
+            CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
+            model.LocationList = collectionsObj.LocationList();
+            model.FoodDescriptionList = collectionsObj.FoodDescriptionList();
+
+            if (ModelState.IsValid)
             {
+                int resultInt = 0;
+                if (!int.TryParse(model.Quantity, out resultInt))
+                {
+                    ViewBag.ErrorMessage = "Please enter a valid Quantity.";
+                    return View(model);
+                }
+
                 string responseOne = string.Empty;
                 var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
                 var createDonation = _configuration.GetSection("Donation:POST:AddNewDonation").Get<string>();
@@ -74,7 +85,7 @@ namespace FWMS.Controllers
                     CreateDonationModel cdM = new CreateDonationModel();
                     cdM.DonationName = model.DonationName;
                     cdM.Quantity = model.Quantity;
-                    cdM.ExpiryDate = DateTime.Now.AddDays(1);
+                    cdM.ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1);
                     cdM.CreatedBy = HttpContext.Session.GetString(USERNAME);
                     cdM.LocationId = model.LocationId;
                     cdM.FoodId = model.FoodId;
@@ -94,9 +105,9 @@ namespace FWMS.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = "Please enter all the fields.";
+                ViewBag.ErrorMessage = "Please enter all fields.";
             }
-            return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Dashboard") : View("CreateDonation", model);
+            return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Donations") : View(model);
         }
 
         public IActionResult EditDonation()

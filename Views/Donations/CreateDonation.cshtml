@@ -22,29 +22,25 @@
         </div>
         <br />
         @*<div class="form-group">
-            <div class='input-group date' id='datetimepicker1'>
-                <input type='text' class="form-control" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+                <div class='input-group date' id='datetimepicker1'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
             </div>
-        </div>*@
+        <br />*@
+        @Html.DropDownListFor(m => m.LocationId,
+                         new SelectList(Model.LocationList, "locationId", "locationName"),
+                         "Select Pickup Location", new { @class = "form-control" })
         <br />
-        <div class="form-group">
-            @Html.DropDownListFor(m => m.LocationId,
-                             new SelectList(Model.LocationList, "locationId", "locationName"),
-                             "Select location")
-        </div>
-        <br />
-        <div class="form-group">
-            @Html.DropDownListFor(m => m.FoodId,
-                             new SelectList(Model.FoodDescriptionList, "foodId", "description"),
-                             "Select food")
-        </div>
+        @Html.DropDownListFor(m => m.FoodId,
+                         new SelectList(Model.FoodDescriptionList, "foodId", "description"),
+                         "Select Food Type", new { @class = "form-control" })
         <br />
         <br />
         <div class="form-group">
-            <button type="submit" class="btn btn-success col-12">Create</button>
+            <button type="submit" class="btn btn-success col-12">Create donation</button>
         </div>
         <br />
     </form>
