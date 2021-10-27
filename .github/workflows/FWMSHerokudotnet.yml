@@ -28,8 +28,7 @@ jobs:
       run: |
         heroku container:push web -a $APP_NAME
         heroku container:release web -a $APP_NAME
-	
-  # Trigger FWMS Tests
+
   ping:
     needs: build
     runs-on: ubuntu-latest
