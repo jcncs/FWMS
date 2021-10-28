@@ -5,68 +5,74 @@
 }
 <p>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                S/N
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HomePhone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OfficePhone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAccountDisabled)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RoleName)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="card">
+    <div class="card-header bg-secondary text-white text-center"><h4 class="display-6"><b>Manage Users</b></h4></div>
+    <div class="card-body">
+        <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        S/N
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.HomePhone)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OfficePhone)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IsAccountDisabled)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RoleName)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
 
-            @foreach (var item in Model)
-            {
-        <tr>
-            <td>
-                @sno
-                @{sno++;}
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HomePhone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OfficePhone)a
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <form asp-action="EditUser" asp-controller="Admin" id=@item.UserId method="post">
-                <input type="hidden" name="UserId" value="@item.UserId" />
-            <td>
-                @Html.CheckBox("IsAccountDisabledCheckbox",item.IsAccountDisabledCheckbox)
-            </td>
-            <td>
-                @Html.DropDownList("RoleName", item.ListRole)
-            </td>
-            <td>
-                <input type="submit" class="btn btn-success" value="Update" />
-            </td>
-            </form>
-        </tr>
-        }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @sno
+                            @{sno++;}
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HomePhone)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OfficePhone)a
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <form asp-action="EditUser" asp-controller="Admin" id=@item.UserId method="post">
+                            <input type="hidden" name="UserId" value="@item.UserId" />
+                        <td>
+                            @Html.CheckBox("IsAccountDisabledCheckbox", item.IsAccountDisabledCheckbox)
+                        </td>
+                        <td>
+                            @Html.DropDownList("RoleName", item.ListRole)
+                        </td>
+                        <td>
+                            <input type="submit" class="btn btn-success" value="Update" />
+                        </td>
+                        </form>
+                    </tr>
+                }
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+</div>
+

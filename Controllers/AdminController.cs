@@ -283,7 +283,7 @@ namespace FWMS.Controllers
             {
                 result = "1";
             }
-            //Return back to view all user
+            //Return back to Manage Users
             EditUserModel EditUser = new EditUserModel()
             {
                 UserId = UserId,
