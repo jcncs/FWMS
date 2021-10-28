@@ -171,11 +171,16 @@ namespace FWMS.Controllers
         
         {
             //check if current user is equal to admin
-            
-            List<UserProfileModel> DropDownRole = RetrieveAllUser();
+
+            List<Roles> DropDownRole = RetrieveRoles();
+            //Remove admin list;
+            Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
+            //Get than remove;
+            DropDownRole.Remove(AdminRole);
 
             //Create dropdown list
             ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
+
 
 
             return View();
@@ -241,7 +246,7 @@ namespace FWMS.Controllers
             //Get back dropdown
             List<Roles> DropDownRole = RetrieveRoles();
             //Get dropdown list for each
-            List <UserProfileModel> AllProfile = RetrieveAllUser();
+            List <UserProfileModel> AllProfile = RetrieveAllUsers();
             foreach (UserProfileModel item in AllProfile)
             {
                 if (item.IsAccountDisabled.Equals("1"))
@@ -265,19 +270,6 @@ namespace FWMS.Controllers
             }
 
             return View(AllProfile);
-        }
-        [HttpGet("{id}")]
-        public IActionResult EditUser(string id)
-
-        {
-            List<UserProfileModel> UserProfileall=  RetrieveAllUser();
-            UserProfileModel userProfile = UserProfileall.Find(u => u.UserId.Equals(id));
-            List<Roles> DropDownRole = RetrieveRoles();
-            //Create dropdown list
-            ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
-
-
-            return View(userProfile);
         }
         [HttpPost]
         public async Task<IActionResult> EditUser(string UserId,string RoleName, bool IsAccountDisabledCheckbox)
@@ -446,7 +438,7 @@ namespace FWMS.Controllers
             return result;
         }
 
-        private List<UserProfileModel> RetrieveAllUser()
+        private List<UserProfileModel> RetrieveAllUsers()
         {
             string response = string.Empty;
             var apiGateway = _configuration["ApiGateway"];
