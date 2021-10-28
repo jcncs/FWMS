@@ -237,7 +237,7 @@ namespace FWMS.Controllers
                 }
             }
 
-            return RedirectToAction("index", "login");
+            return RedirectToAction("login", "admin");
         }
 
         public IActionResult GetAllUser ()
