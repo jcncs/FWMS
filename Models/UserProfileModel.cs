@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -23,5 +24,8 @@ namespace FWMS.Models
         public string RoleId { get; set; }
         [DisplayName("Role")]
         public string RoleName { get; set; }
+        public bool IsAccountDisabledCheckbox { get; set; }
+
+        public List<SelectListItem> ListRole { get; set; }
     }
 }
