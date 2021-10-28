@@ -4,50 +4,45 @@
 }
 
 <div class="text-center my-auto">
-    <div class="card">
-        <div class="card-header bg-secondary text-white"><h1 class="display-6"><b>Sign in</b></h1></div>
-
-        <div class="card-body">
+    <h1 class="display-6"><b>Sign In</b></h1>
 
 
-            <div class="container-fluid col-lg-4 col-6">
+    <div class="container-fluid col-lg-4 col-6">
 
-                <br />
-                <div class="alert alert-danger" style="@(@ViewBag.ErrorMessage == null? "display:none": "display:block")">
-                    <p>@ViewBag.ErrorMessage</p>
-                </div>
-                @using (Html.BeginForm("Login", "Admin", FormMethod.Post))
-                {
-                    <form>
-                        <div class="form-group">
-                            <input class="form-control" placeholder="Username" name="userName" id="userName">
-                        </div>
-                        <br />
-                        <div class="form-group icon-div">
-                            <input type="password" class="form-control" placeholder="Password" name="pwdHash" id="pwdHash">
-                            <i onclick="show('pwdHash')" class="fas fa-eye-slash" id="display"></i>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                            <input id="cbRmbMe" type="checkbox" />
-                            <label for="cbRmbMe">Remember me</label>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success col-12" id="submitBtn">Login</button>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                            <a style="text-decoration:none;color:#212529" asp-area="" asp-controller="Admin" asp-action="ForgetPassword">I forgot my password</a>
-                        </div>
-                        <br />
-                        <div class="form-group">
-                            <label for="newacc">Don't have an account?</label>&nbsp;<a style="text-decoration:none;color:#2E77AE;" asp-area="" asp-controller="Admin" asp-action="register">Create account</a>
-                        </div>
-                    </form>
-                }
-            </div>
+        <br />
+        <div class="alert alert-danger" style="@(@ViewBag.ErrorMessage == null? "display:none": "display:block")">
+            <p>@ViewBag.ErrorMessage</p>
         </div>
+        @using (Html.BeginForm("Login", "Admin", FormMethod.Post))
+        {
+            <form>
+                <div class="form-group">
+                    <input class="form-control" placeholder="Username" name="userName" id="userName">
+                </div>
+                <br />
+                <div class="form-group icon-div">
+                    <input type="password" class="form-control" placeholder="Password" name="pwdHash" id="pwdHash">
+                    <i onclick="show('pwdHash')" class="fas fa-eye-slash" id="display"></i>
+                </div>
+                <br />
+                <div class="form-group">
+                    <input id="cbRmbMe" type="checkbox" />
+                    <label for="cbRmbMe">Remember me</label>
+                </div>
+                <br />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success col-12" id="submitBtn">Login</button>
+                </div>
+                <br />
+                <div class="form-group">
+                    <a style="text-decoration:none;color:#212529" asp-area="" asp-controller="Admin" asp-action="ForgetPassword">I forgot my password</a>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label for="newacc">Don't have an account?</label>&nbsp;<a style="text-decoration:none;color:#2E77AE;" asp-area="" asp-controller="Admin" asp-action="register">Create account</a>
+                </div>
+            </form>
+        }
     </div>
 </div>
 <script type="text/javascript">
