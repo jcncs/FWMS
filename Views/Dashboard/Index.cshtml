@@ -1,13 +1,193 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    @model List<ViewDashboardModel>;
 }
 
 <div class="text-center">
+
     <div class="card">
         <div class="card-header bg-secondary text-white"><h1 class="display-6"><b>Dashboard</b></h1></div>
         <div class="card-body">
-            <p>text text to fill up space</p>
+            <div class="card-header bg-dark text-white"><h1 class="display-6 my-auto" style="font-size: 26px !important"><b>Statistics</b></h1></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-center">
+                    <div style="width: 300px; height: 300px;">
+                        <canvas id="CatQuantChart"></canvas>
+                    </div>
+                    <div style="width: 600px; height: 300px;">
+                        <canvas id="LocQuantChart"></canvas>
+                    </div>
+                </div>
+            </div>
 
+            <div class="card-header bg-dark text-white"><h1 class="display-6 my-auto" style="font-size: 26px !important"><b>Available Donations</b></h1></div>
+            @if (Model.Count() > 0)
+            {
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col">
+
+                            <div class="card" style="width: 18.6rem;">
+                                <img src="/Image/donation-icon.png" class="card-img-top mx-auto mt-3" style="width: 100px; height: 100px;" alt="donation">
+                                <div class="card-body">
+                                    <h5 class="card-title">@item.donationName</h5>
+                                    <p class="card-text">@item.locationName</p>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Category</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.category</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Desc.</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.description</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Quantity</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.quantity</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Exp. Dt</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.expiryDate</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    @*<li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-lg-5 col-5">
+                                                    <label for=""><b>Created By</b></label>
+                                                </div>
+                                                <div class="col-lg-7 col-7">
+                                                    <label for="">@item.createdBy</label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-lg-5 col-5">
+                                                    <label for=""><b>Created Dt</b></label>
+                                                </div>
+                                                <div class="col-lg-7 col-7">
+                                                    <label for="">@item.createdDate</label>
+                                                </div>
+                                            </div>
+                                        </li>*@
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Reserved By</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.reservedBy</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-lg-5 col-5">
+                                                <label for=""><b>Reserved Dt</b></label>
+                                            </div>
+                                            <div class="col-lg-7 col-7">
+                                                <label for="">@item.reservedDate</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="card-body">
+                                    <a href="#" class="btn btn-danger">Remove</a>
+                                    <a href="#" class="btn btn-success">Reserve</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>
+                    No Available Donations
+                </p>
+            }
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('CatQuantChart');
+    const chart1 = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.Select(e => $"'{e.category}'")))],
+            datasets: [{
+                label: 'Food Donation Quantity Per Category',
+                data: [@string.Join(",", Model.Select(e => e.quantity))],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(54, 255, 99)',
+                    'rgb(255, 99, 255)',
+                    'rgb(54, 205, 86)',
+                    'rgb(162, 162, 162)',
+                    'rgb(54, 99, 99)'
+                ], hoverOffset: 4
+            }]
+        }
+    });
+
+    const ctx2 = document.getElementById('LocQuantChart');
+    const chart2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.Select(e => $"'{e.locationName}'")))],
+            datasets: [{
+                label: 'Food Donation Quantity Per Location',
+                data: [@string.Join(",", Model.Select(e => e.quantity))],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(255, 159, 64, 0.5)',
+                    'rgba(255, 205, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(153, 102, 255, 0.5)',
+                    'rgba(201, 203, 207, 0.5)'
+                ],
+                borderColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 159, 64)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(54, 162, 235)',
+                    'rgb(153, 102, 255)',
+                    'rgb(201, 203, 207)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        }
+    });
+</script>
