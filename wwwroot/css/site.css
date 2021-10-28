@@ -12,9 +12,13 @@ a.navbar-brand {
     color: #228B22;
 }
 
-
 .navbar {
-    background-color: #dafcea;
+    /*background-color: #dafcea;*/
+    /*background-color: #8fc0a9;*/
+    background-color: #364958;
+}
+.navbar-text {
+    color: #faf3dd !important
 }
 /* Provide sufficient contrast against white background */
 a {

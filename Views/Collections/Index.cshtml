@@ -4,33 +4,36 @@
 }
 
 <div class="text-center">
-    <h1 class="display-6"><b>Collections</b></h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">CollectionId</th>
-                <th scope="col">CollectionName</th>
-                <th scope="col">CollectionDate</th>
-                <th scope="col">DonationId</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int i = 0;
-                foreach (var item in Model)
-                {
-                    i++;
+    <div class="card">
+        <div class="card-header bg-secondary text-white"><h1 class="display-6"><b>Collections</b></h1></div>
+        <div class="card-body">
+            <table class="table">
+                <thead class="table-dark">
                     <tr>
-                        <th scope="row">@i</th>
-                        <td>@item.collectionId</td>
-                        <td>@item.collectionName</td>
-                        <td>@item.collectionDate</td>
-                        <td>@item.donationId</td>
+                        <th scope="col">#</th>
+                        <th scope="col">CollectionId</th>
+                        <th scope="col">CollectionName</th>
+                        <th scope="col">CollectionDate</th>
+                        <th scope="col">DonationId</th>
                     </tr>
-                }
-            }
-        </tbody>
-    </table>
-</div>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                        foreach (var item in Model)
+                        {
+                            i++;
+                            <tr>
+                                <th scope="row">@i</th>
+                                <td>@item.collectionId</td>
+                                <td>@item.collectionName</td>
+                                <td>@item.collectionDate</td>
+                                <td>@item.donationId</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+

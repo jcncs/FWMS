@@ -4,55 +4,60 @@
 }
 
 <div class="text-center">
-    <h1 class="display-6"><b>View Donation Status</b></h1>
-    <a style="color:#2E77AE;" asp-area="" asp-controller="Donations" asp-action="CreateDonation">Create new donation</a>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">DonationId</th>
-                <th scope="col">DonationName</th>
-                <th scope="col">Category</th>
-                <th scope="col">Description</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">ExpiryDate</th>
-                <th scope="col">CreatedDate</th>
-                <th scope="col">CreatedBy</th>
-                @*<th scope="col">UpdatedDate</th>
+    @*<h1 class="display-6"><b>View Donation Status</b></h1>*@
+    <div class="card">
+        <div class="card-header bg-secondary text-white"><h1>Donation Status</h1></div>
+        <div class="card-body">
+            <table class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        @*<th scope="col">DonationId</th>*@
+                        <th scope="col">DonationName</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">ExpiryDate</th>
+                        <th scope="col">CreatedDate</th>
+                        <th scope="col">CreatedBy</th>
+                        @*<th scope="col">UpdatedDate</th>
                     <th scope="col">UpdatedBy</th>
                     <th scope="col">UserId</th>*@
-                <th scope="col">ReservedBy</th>
-                <th scope="col">ReservedDate</th>
-                <th scope="col">CollectionId</th>
-                <th scope="col">FoodEntryId</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int i = 0;
-                foreach (var item in Model)
-                {
-                    i++;
-                    <tr>
-                        <th scope="row">@i</th>
-                        <td>@item.donationId</td>
-                        <td>@item.donationName</td>
-                        <td>@item.category</td>
-                        <td>@item.description</td>
-                        <td>@item.quantity</td>
-                        <td>@item.expiryDate</td>
-                        <td>@item.createdDate</td>
-                        <td>@item.createdBy</td>
-                        @*<td>@item.updatedDate</td>
+                        <th scope="col">ReservedBy</th>
+                        <th scope="col">ReservedDate</th>
+                        @*<th scope="col">CollectionId</th>
+                    <th scope="col">FoodEntryId</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                        foreach (var item in Model)
+                        {
+                            i++;
+                            <tr>
+                                <th scope="row">@i</th>
+                                @*<td>@item.donationId</td>*@
+                                <td>@item.donationName</td>
+                                <td>@item.category</td>
+                                <td>@item.description</td>
+                                <td>@item.quantity</td>
+                                <td>@item.expiryDate</td>
+                                <td>@item.createdDate</td>
+                                <td>@item.createdBy</td>
+                                @*<td>@item.updatedDate</td>
                             <td>@item.updatedBy</td>
                             <td>@item.userId</td>*@
-                        <td>@item.reservedBy</td>
-                        <td>@item.reservedDate</td>
-                        <td>@item.collectionId</td>
-                        <td>@item.foodEntryId</td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
+                                <td>@item.reservedBy</td>
+                                <td>@item.reservedDate</td>
+                                @*<td>@item.collectionId</td>
+                            <td>@item.foodEntryId</td>*@
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>

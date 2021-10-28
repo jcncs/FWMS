@@ -2,10 +2,8 @@
     ViewData["Title"] = "Profile";
     @model ViewProfileModel;
 }
-<div class="text-center">
-    <h1 class="display-6"><b>Your Profile</b></h1>
-</div>
-<div class="card mb-12 mx-auto" style="max-width: 1000px;">
+<div class="card mb-12 mx-auto">
+    <div class="card-header bg-secondary text-white text-center"><h4 class="display-6"><b>Your Profile</b></h4></div>
     <div class="row g-0">
         <div class="col-md-4">
             <img src="~/Image/profile-icon.png" class="img-fluid rounded-start" alt="profile">
@@ -14,7 +12,7 @@
             <div class="card-body">
                 <h4 class="card-title">@Model.userName</h4>
                 <p class="card-text">Admin account to access all FWMS functions.</p>
-                    @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
+                @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
                 <br />
                 <br />
                 <div class="row">
