@@ -171,11 +171,16 @@ namespace FWMS.Controllers
         
         {
             //check if current user is equal to admin
-            
-            List<UserProfileModel> DropDownRole = RetrieveAllUser();
+
+            List<Roles> DropDownRole = RetrieveRoles();
+            //Remove admin list;
+            Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
+            //Get than remove;
+            DropDownRole.Remove(AdminRole);
 
             //Create dropdown list
             ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
+
 
 
             return View();
@@ -238,12 +243,98 @@ namespace FWMS.Controllers
         public IActionResult GetAllUser ()
 
         {
-            //
-            List<UserProfileModel> DropDownRole = RetrieveAllUser();
+            //Get back dropdown
+            List<Roles> DropDownRole = RetrieveRoles();
+            //Get dropdown list for each
+            List <UserProfileModel> AllProfile = RetrieveAllUsers();
+            foreach (UserProfileModel item in AllProfile)
+            {
+                if (item.IsAccountDisabled.Equals("1"))
+                {
+                    item.IsAccountDisabledCheckbox = true;
+                }
+                else
+                {
+                    item.IsAccountDisabledCheckbox = false;
+                }
+                item.ListRole = new List<SelectListItem>();
+                foreach (Roles role in DropDownRole)
+                {
+                    item.ListRole.Add(new SelectListItem
+                    {
+                        Text = role.RoleName,
+                        Value = role.RoleName,
+                        Selected = (item.RoleName == role.RoleName)
+                    });
+                }
+            }
+
+            return View(AllProfile);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditUser(string UserId,string RoleName, bool IsAccountDisabledCheckbox)
+
+        {
+
+            //string result = EditUseAsync(model);
             //Remove admin list;
+            string result = "0";
+            if (IsAccountDisabledCheckbox)
+            {
+                result = "1";
+            }
+            //Return back to view all user
+            EditUserModel EditUser = new EditUserModel()
+            {
+                UserId = UserId,
+                roleName = RoleName,
+                Disable = result
+            };
 
+            string responseOne = string.Empty;
+            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+            var create = _configuration.GetSection("Authentication:POST:editUser").Get<string>();
+            HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
+            httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
+            httpWebRequestCreateUser.Method = "POST";
+            httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
+            {
+                EditUserModel EditClass = new EditUserModel()
+                {
+                    UserId = EditUser.UserId,
+                    UserName = EditUser.UserName,
+                    PwdHash = EditUser.PwdHash,
+                    Email = EditUser.Email,
+                    HomePhone = EditUser.HomePhone,
+                    OfficePhone = EditUser.OfficePhone,
+                    UpdatedBy = EditUser.UserName,
+                    Disable = EditUser.Disable,
+                    roleName = EditUser.roleName
+                };
+                string json = JsonConvert.SerializeObject(EditClass);
 
-            return View(DropDownRole);
+                streamWriter.Write(json);
+            }
+
+            HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+            {
+                responseOne = streamReader.ReadToEnd();
+            }
+            httpResponseCreateUser.Close();
+
+            string message = "";
+            if (responseOne.Equals("Username already exist"))
+            {
+                message = "UserName does not exist";
+            }
+            else if (responseOne.Equals("UserInfo does not exist"))
+            {
+                message = "UserInfo does not exist";
+            }
+
+            return RedirectToAction("GetAllUser", "Admin");
         }
 
         public IActionResult Logout()
@@ -347,7 +438,7 @@ namespace FWMS.Controllers
             return result;
         }
 
-        private List<UserProfileModel> RetrieveAllUser()
+        private List<UserProfileModel> RetrieveAllUsers()
         {
             string response = string.Empty;
             var apiGateway = _configuration["ApiGateway"];
@@ -363,45 +454,21 @@ namespace FWMS.Controllers
             }
             httpResponse.Close();
             List<UserProfileModel> result = Deserialize<List<UserProfileModel>>(response);
+            foreach(UserProfileModel item in result)
+            {
+                if (item.IsAccountDisabled.Equals("1"))
+                {
+                    item.IsAccountDisabledCheckbox = true;
+                }
+                else
+                {
+                    item.IsAccountDisabledCheckbox = false;
+                }
+            }
+
             return result;
         }
 
-        private string CreateUser(RegisterViewModel model)
-        {
-            string responseOne = string.Empty;
-            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-            var create = _configuration.GetSection("Authentication:POST:CreateUser").Get<string>();
-            HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
-            httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
-            httpWebRequestCreateUser.Method = "POST";
-            httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
-            {
-                RegisterClass registerclass = new RegisterClass() { 
-                           UserName =model.Username,
-                            PwdHash =model.Password,
-                             Email =model.Email,
-                            HomePhone =model.ContractNumber,
-                            OfficePhone=model.SecContractNumber,
-                            CreatedBy=model.Username,
-                            roleName=model.RoleDown
-                };
-                string json = JsonConvert.SerializeObject(registerclass);
-
-                streamWriter.Write(json);
-            }
-
-            HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
-            using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
-            {
-                responseOne = streamReader.ReadToEnd();
-            }
-            httpResponseCreateUser.Close();
-
-            var resultLoginjson = JsonConvert.DeserializeObject(responseOne).ToString();
-
-            return "ok";
-        }
 
     }
 }

@@ -33,7 +33,9 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+
+            @foreach (var item in Model)
+            {
         <tr>
             <td>
                 @sno
@@ -46,25 +48,25 @@
                 @Html.DisplayFor(modelItem => item.HomePhone)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OfficePhone)
+                @Html.DisplayFor(modelItem => item.OfficePhone)a
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
+            <form asp-action="EditUser" asp-controller="Admin" id=@item.UserId method="post">
+                <input type="hidden" name="UserId" value="@item.UserId" />
             <td>
-        @if(item.IsAccountDisabled.Equals(0)){
-        <input type="checkbox" id="1" name="disable" value="0" checked disabled READONLY>
-        }else{
-        <input type="checkbox" id="2" name="disable" value="1"  disabled READONLY>
-        }
+                @Html.CheckBox("IsAccountDisabledCheckbox",item.IsAccountDisabledCheckbox)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoleName)
+                @Html.DropDownList("RoleName", item.ListRole)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id= item.UserId })
+                <input type="submit" class="btn btn-success" value="Update" />
             </td>
+            </form>
         </tr>
-}
-    </tbody>
-</table>
+        }
+
+        </tbody>
+    </table>
