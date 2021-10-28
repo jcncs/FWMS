@@ -2,46 +2,48 @@
     ViewData["Title"] = "Profile";
     @model ViewProfileModel;
 }
-
-<div class="my-auto">
-    <div class="container-fluid col-lg-4 col-6">
-        <h1 class="display-6"><b>View your Profile</b></h1>
-        <br />
-        <div class="row">
-            <div class="col-lg-8 col-8">
-                <label for=""><b>Username</b></label>
-            </div>
-            <div class="col-lg-4 col-4">
-                <label for="">@Model.userName</label>
+<div class="text-center">
+    <h1 class="display-6"><b>Your Profile</b></h1>
+</div>
+<div class="card mb-12 mx-auto" style="max-width: 1000px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="~/Image/profile-icon.png" class="img-fluid rounded-start" alt="profile">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h4 class="card-title">@Model.userName</h4>
+                <p class="card-text">Admin account to access all FWMS functions.</p>
+                    @*<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>*@
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-lg-5 col-5">
+                        <label for=""><b>Contact Number</b></label>
+                    </div>
+                    <div class="col-lg-7 col-7">
+                        <label for="">@Model.homePhone</label>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-lg-5 col-5">
+                        <label for=""><b>Secondary Contact Number</b></label>
+                    </div>
+                    <div class="col-lg-7 col-7">
+                        <label for="">@Model.officePhone</label>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-lg-5 col-5">
+                        <label for=""><b>Email Address</b></label>
+                    </div>
+                    <div class="col-lg-7 col-7">
+                        <label for="">@Model.email</label>
+                    </div>
+                </div>
             </div>
         </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-8 col-8">
-                <label for=""><b>Email</b></label>
-            </div>
-            <div class="col-lg-4 col-4">
-                <label for="">@Model.email</label>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-8 col-8">
-                <label for=""><b>Contact number</b></label>
-            </div>
-            <div class="col-lg-4 col-4">
-                <label for="">@Model.homePhone</label>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-lg-8 col-8">
-                <label for=""><b>Secondary contact number</b></label>
-            </div>
-            <div class="col-lg-4 col-4">
-                <label for="">@Model.officePhone</label>
-            </div>
-        </div>
-        <br />
     </div>
 </div>
