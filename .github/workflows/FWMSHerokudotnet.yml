@@ -32,22 +32,26 @@ jobs:
         heroku container:push web -a $STG_APP_NAME
         heroku container:release web -a $STG_APP_NAME
 
-  ping-pong:
+  ping:
     # Trigger repository dispatch 'ping' to FWMS_Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
     - name: PING - Dispatch initiating repository event
-      if: github.event.action != 'pong'
       run: |
         curl -X POST https://api.github.com/repos/jcncs/FWMS_Tests/dispatches \
         -H 'Accept: application/vnd.github.everest-preview+json' \
         -u ${{ secrets.FWMS_ACCESS_TOKEN }} \
         --data '{"event_type": "ping", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
         
+  ack:
+    # Trigger deployment to fwms-prod upon receving pong from FWMS_Tests
+    runs-on: ubuntu-latest
+    steps:
     - name: ACK - Acknowledge successful pong from FWMS_Tests
       if: github.event.action == 'pong'
       run: |
         echo "PONG received from '${{ github.event.client_payload.repository }}'" && \
+        docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
         heroku container:push web -a $PROD_APP_NAME
         heroku container:release web -a $PROD_APP_NAME
