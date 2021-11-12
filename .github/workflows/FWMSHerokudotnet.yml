@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+  repository_dispatch:
 
 env:
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
