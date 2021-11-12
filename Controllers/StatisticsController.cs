@@ -23,21 +23,29 @@ namespace FWMS.Controllers
 
         public IActionResult Index()
         {
-            string response = string.Empty;
-            var apiGateway = _configuration["ApiGateway"];
-            var getDonorLeaderboard = _configuration["Statistics:GET:GetDonorLeaderboard"];
-            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+getDonorLeaderboard);
-            httpWebRequest.ContentType = "application/json; charset=utf-8";
-            httpWebRequest.Method = "GET";
-            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            try
             {
-                response = streamReader.ReadToEnd();
+                string response = string.Empty;
+                var apiGateway = _configuration["ApiGateway"];
+                var getDonorLeaderboard = _configuration["Statistics:GET:GetDonorLeaderboard"];
+                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+getDonorLeaderboard);
+                httpWebRequest.ContentType = "application/json; charset=utf-8";
+                httpWebRequest.Method = "GET";
+                httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    response = streamReader.ReadToEnd();
+                }
+                httpResponse.Close();
+                List<ViewStatisticsModel> result = Deserialize<List<ViewStatisticsModel>>(response);
+                return View(result);
             }
-            httpResponse.Close();
-            List<ViewStatisticsModel> result = Deserialize<List<ViewStatisticsModel>>(response);
-            return View(result);
+            catch (System.Exception)
+            {
+                return View("Error");
+                throw;
+            }
         }
 
         public IActionResult CreateDonation()
