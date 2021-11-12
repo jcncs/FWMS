@@ -41,79 +41,87 @@ namespace FWMS.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // 1. Login
-                string responseOne = string.Empty;
-                var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-                var login = _configuration.GetSection("Authentication:POST:Login").Get<string>();
-                HttpWebRequest httpWebRequestLogin = (HttpWebRequest)WebRequest.Create(apiGateway + login);
-                httpWebRequestLogin.ContentType = "application/json; charset=utf-8";
-                httpWebRequestLogin.Method = "POST";
-                httpWebRequestLogin.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                using (var streamWriter = new StreamWriter(httpWebRequestLogin.GetRequestStream()))
+                if (ModelState.IsValid)
                 {
-                    LoginModel loginM = new LoginModel();
-                    loginM.userName = model.userName;
-                    loginM.pwdHash = model.pwdHash;
-
-                    string json = JsonConvert.SerializeObject(loginM);
-
-                    streamWriter.Write(json);
-                }
-
-                HttpWebResponse httpResponseLogin = (HttpWebResponse)httpWebRequestLogin.GetResponse();
-                using (StreamReader streamReader = new StreamReader(httpResponseLogin.GetResponseStream()))
-                {
-                    responseOne = streamReader.ReadToEnd();
-                }
-                httpResponseLogin.Close();
-
-                var resultLoginjson = JsonConvert.DeserializeObject(responseOne).ToString();
-
-                // 2. verify
-                if (!(resultLoginjson.Trim().Equals(NoUserFound) || resultLoginjson.Trim().Equals(FailedAuthentication)))
-                {
-                    string responseTwo = string.Empty;
-                    var verify = _configuration.GetSection("Authentication:GET:Verify").Get<string>();
-                    HttpWebRequest httpWebRequestVerify = (HttpWebRequest)WebRequest.Create(apiGateway + verify);
-                    httpWebRequestVerify.ContentType = "application/json; charset=utf-8";
-                    httpWebRequestVerify.Method = "GET";
-                    //httpWebRequestVerify.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                    httpWebRequestVerify.Headers.Add(AUTHORIZATION, "Bearer " + resultLoginjson);
-
-                    HttpWebResponse httpResponseVerify = (HttpWebResponse)httpWebRequestVerify.GetResponse();
-
-                    using (StreamReader streamReadertwo= new StreamReader(httpResponseVerify.GetResponseStream()))
+                    // 1. Login
+                    string responseOne = string.Empty;
+                    var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                    var login = _configuration.GetSection("Authentication:POST:Login").Get<string>();
+                    HttpWebRequest httpWebRequestLogin = (HttpWebRequest)WebRequest.Create(apiGateway + login);
+                    httpWebRequestLogin.ContentType = "application/json; charset=utf-8";
+                    httpWebRequestLogin.Method = "POST";
+                    httpWebRequestLogin.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                    using (var streamWriter = new StreamWriter(httpWebRequestLogin.GetRequestStream()))
                     {
-                        responseTwo = streamReadertwo.ReadToEnd();
+                        LoginModel loginM = new LoginModel();
+                        loginM.userName = model.userName;
+                        loginM.pwdHash = model.pwdHash;
+
+                        string json = JsonConvert.SerializeObject(loginM);
+
+                        streamWriter.Write(json);
                     }
 
-                    httpResponseVerify.Close();
+                    HttpWebResponse httpResponseLogin = (HttpWebResponse)httpWebRequestLogin.GetResponse();
+                    using (StreamReader streamReader = new StreamReader(httpResponseLogin.GetResponseStream()))
+                    {
+                        responseOne = streamReader.ReadToEnd();
+                    }
+                    httpResponseLogin.Close();
 
-                    if (!(string.IsNullOrWhiteSpace(responseTwo)))
+                    var resultLoginjson = JsonConvert.DeserializeObject(responseOne).ToString();
+
+                    // 2. verify
+                    if (!(resultLoginjson.Trim().Equals(NoUserFound) || resultLoginjson.Trim().Equals(FailedAuthentication)))
                     {
-                        ViewBag.ErrorMessage = "The username or password is incorrect.";
+                        string responseTwo = string.Empty;
+                        var verify = _configuration.GetSection("Authentication:GET:Verify").Get<string>();
+                        HttpWebRequest httpWebRequestVerify = (HttpWebRequest)WebRequest.Create(apiGateway + verify);
+                        httpWebRequestVerify.ContentType = "application/json; charset=utf-8";
+                        httpWebRequestVerify.Method = "GET";
+                        //httpWebRequestVerify.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                        httpWebRequestVerify.Headers.Add(AUTHORIZATION, "Bearer " + resultLoginjson);
+
+                        HttpWebResponse httpResponseVerify = (HttpWebResponse)httpWebRequestVerify.GetResponse();
+
+                        using (StreamReader streamReadertwo= new StreamReader(httpResponseVerify.GetResponseStream()))
+                        {
+                            responseTwo = streamReadertwo.ReadToEnd();
+                        }
+
+                        httpResponseVerify.Close();
+
+                        if (!(string.IsNullOrWhiteSpace(responseTwo)))
+                        {
+                            ViewBag.ErrorMessage = "The username or password is incorrect.";
+                        }
+                        else
+                        {
+                            LoginUserInfoModel resultUserInfo = RetrieveUserInfo(model.userName);
+                            HttpContext.Session.SetString(ROLE, resultUserInfo.roleId);
+                            HttpContext.Session.SetString(USERNAME, resultUserInfo.userName);
+                            HttpContext.Session.SetString(USERID, resultUserInfo.userId);
+                        }
                     }
-                    else 
+                    else
                     {
-                        LoginUserInfoModel resultUserInfo = RetrieveUserInfo(model.userName);
-                        HttpContext.Session.SetString(ROLE, resultUserInfo.roleId);
-                        HttpContext.Session.SetString(USERNAME, resultUserInfo.userName);
-                        HttpContext.Session.SetString(USERID, resultUserInfo.userId);
+                        ViewBag.ErrorMessage ="The username or password is incorrect.";
                     }
                 }
-                else 
+                else
                 {
-                    ViewBag.ErrorMessage ="The username or password is incorrect.";
+                    ViewBag.ErrorMessage =  "Please enter your username and password.";
                 }
+
+                return ViewBag.ErrorMessage == null ? RedirectToAction("Index","Dashboard") : View("Login", model);
             }
-            else
+            catch (System.Exception)
             {
-                ViewBag.ErrorMessage =  "Please enter your username and password.";
+                return View("Error");
+                throw;
             }
-
-            return ViewBag.ErrorMessage == null ? RedirectToAction("Index","Dashboard") : View("Login", model);
         }
         public IActionResult Profile()
         {
@@ -129,38 +137,54 @@ namespace FWMS.Controllers
         [HttpPost]
         public ActionResult ForgetPassword(ForgetPasswordModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (IsValidEmail(model.email))
+                if (ModelState.IsValid)
                 {
-                    string response = string.Empty;
-                    var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-                    var sendemail = _configuration.GetSection("Notification:POST:SendEmail").Get<string>();
-                    var postData = "ToEmail=" + model.email;
-                    postData += "&Subject=Reset Password";
-                    postData += "&Body=Kindly use this password to go to the change password page.";
-                    var data = Encoding.ASCII.GetBytes(postData);
-                    HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + sendemail);
-                    httpWebRequest.Method = "POST";
-                    httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-                    httpWebRequest.ContentLength = data.Length;
-                    using (var stream = httpWebRequest.GetRequestStream())
+                    if (IsValidEmail(model.email))
                     {
-                        stream.Write(data, 0, data.Length);
+                        try
+                        {
+                            string response = string.Empty;
+                            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                            var sendemail = _configuration.GetSection("Notification:POST:SendEmail").Get<string>();
+                            var postData = "ToEmail=" + model.email;
+                            postData += "&Subject=Reset Password";
+                            postData += "&Body=Kindly use this password to go to the change password page.";
+                            var data = Encoding.ASCII.GetBytes(postData);
+                            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + sendemail);
+                            httpWebRequest.Method = "POST";
+                            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                            httpWebRequest.ContentLength = data.Length;
+                            using (var stream = httpWebRequest.GetRequestStream())
+                            {
+                                stream.Write(data, 0, data.Length);
+                            }
+                            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                            var responseString = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
+                        }
+                        catch (System.Exception)
+                        {
+                            return View("Error");
+                            throw;
+                        }
                     }
-                    HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    var responseString = new StreamReader(httpResponse.GetResponseStream()).ReadToEnd();
+                    else
+                    {
+                        ViewBag.ErrorMessage = "Please a valid email.";
+                    }
                 }
-                else 
+                else
                 {
-                    ViewBag.ErrorMessage = "Please a valid email.";
+                    ViewBag.ErrorMessage = "Please enter your email.";
                 }
+                return ViewBag.ErrorMessage == null ? View("Login") : View("ForgetPassword");
             }
-            else
+            catch (System.Exception)
             {
-                ViewBag.ErrorMessage = "Please enter your email.";
+                return View("Error");
+                throw;
             }
-            return ViewBag.ErrorMessage == null ? View("Login") : View("ForgetPassword");
         }
         public IActionResult CreateNewAccount()
         {
@@ -168,7 +192,7 @@ namespace FWMS.Controllers
         }
 
         public IActionResult Register()
-        
+
         {
             //check if current user is equal to admin
 
@@ -189,55 +213,64 @@ namespace FWMS.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            try
             {
-                string responseOne = string.Empty;
-                var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-                var create = _configuration.GetSection("Authentication:POST:CreateUser").Get<string>();
-                HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
-                httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
-                httpWebRequestCreateUser.Method = "POST";
-                httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
+                ViewData["ReturnUrl"] = returnUrl;
+                if (ModelState.IsValid)
                 {
-                    RegisterClass registerclass = new RegisterClass()
+                    string responseOne = string.Empty;
+                    var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                    var create = _configuration.GetSection("Authentication:POST:CreateUser").Get<string>();
+                    HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
+                    httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
+                    httpWebRequestCreateUser.Method = "POST";
+                    httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                    using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
                     {
-                        UserName = model.Username,
-                        PwdHash = model.Password,
-                        Email = model.Email,
-                        HomePhone = model.ContractNumber,
-                        OfficePhone = model.SecContractNumber,
-                        CreatedBy = model.Username,
-                        roleName = model.RoleDown
-                    };
-                    string json = JsonConvert.SerializeObject(registerclass);
+                        RegisterClass registerclass = new RegisterClass()
+                        {
+                            UserName = model.Username,
+                            PwdHash = model.Password,
+                            Email = model.Email,
+                            HomePhone = model.ContractNumber,
+                            OfficePhone = model.SecContractNumber,
+                            CreatedBy = model.Username,
+                            roleName = model.RoleDown
+                        };
+                        string json = JsonConvert.SerializeObject(registerclass);
 
-                    streamWriter.Write(json);
+                        streamWriter.Write(json);
+                    }
+
+                    HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
+                    using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+                    {
+                        responseOne = streamReader.ReadToEnd();
+                    }
+                    httpResponseCreateUser.Close();
+                    if (responseOne.Equals("Username already exist"))
+                    {
+                        ModelState.AddModelError("", "Username already exist");
+                        //Get back dropdown
+                        List<Roles> DropDownRole = RetrieveRoles();
+                        //Remove admin list;
+                        Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
+                        //Get than remove;
+                        DropDownRole.Remove(AdminRole);
+                        //Create dropdown list
+                        ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
+                        return View(model);
+                    }
                 }
 
-                HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
-                using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
-                {
-                    responseOne = streamReader.ReadToEnd();
-                }
-                httpResponseCreateUser.Close();
-                if (responseOne.Equals("Username already exist"))
-                {
-                    ModelState.AddModelError("", "Username already exist");
-                    //Get back dropdown
-                    List<Roles> DropDownRole = RetrieveRoles();
-                    //Remove admin list;
-                    Roles AdminRole = DropDownRole.Find(u => u.RoleName.Equals("Admin"));
-                    //Get than remove;
-                    DropDownRole.Remove(AdminRole);
-                    //Create dropdown list
-                    ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
-                    return View(model);
-                }
+                return RedirectToAction("login", "admin");
             }
+            catch (System.Exception)
+            {
+                return View("Error");
+                throw;
 
-            return RedirectToAction("login", "admin");
+            }
         }
 
         public IActionResult GetAllUser ()
@@ -275,66 +308,73 @@ namespace FWMS.Controllers
         public async Task<IActionResult> EditUser(string UserId,string RoleName, bool IsAccountDisabledCheckbox)
 
         {
-
-            //string result = EditUseAsync(model);
-            //Remove admin list;
-            string result = "0";
-            if (IsAccountDisabledCheckbox)
+            try
             {
-                result = "1";
-            }
-            //Return back to Manage Users
-            EditUserModel EditUser = new EditUserModel()
-            {
-                UserId = UserId,
-                roleName = RoleName,
-                Disable = result
-            };
-
-            string responseOne = string.Empty;
-            var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-            var create = _configuration.GetSection("Authentication:POST:editUser").Get<string>();
-            HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
-            httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
-            httpWebRequestCreateUser.Method = "POST";
-            httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
-            {
-                EditUserModel EditClass = new EditUserModel()
+                //string result = EditUseAsync(model);
+                //Remove admin list;
+                string result = "0";
+                if (IsAccountDisabledCheckbox)
                 {
-                    UserId = EditUser.UserId,
-                    UserName = EditUser.UserName,
-                    PwdHash = EditUser.PwdHash,
-                    Email = EditUser.Email,
-                    HomePhone = EditUser.HomePhone,
-                    OfficePhone = EditUser.OfficePhone,
-                    UpdatedBy = EditUser.UserName,
-                    Disable = EditUser.Disable,
-                    roleName = EditUser.roleName
+                    result = "1";
+                }
+                //Return back to Manage Users
+                EditUserModel EditUser = new EditUserModel()
+                {
+                    UserId = UserId,
+                    roleName = RoleName,
+                    Disable = result
                 };
-                string json = JsonConvert.SerializeObject(EditClass);
 
-                streamWriter.Write(json);
+                string responseOne = string.Empty;
+                var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                var create = _configuration.GetSection("Authentication:POST:editUser").Get<string>();
+                HttpWebRequest httpWebRequestCreateUser = (HttpWebRequest)WebRequest.Create(apiGateway + create);
+                httpWebRequestCreateUser.ContentType = "application/json; charset=utf-8";
+                httpWebRequestCreateUser.Method = "POST";
+                httpWebRequestCreateUser.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                using (var streamWriter = new StreamWriter(httpWebRequestCreateUser.GetRequestStream()))
+                {
+                    EditUserModel EditClass = new EditUserModel()
+                    {
+                        UserId = EditUser.UserId,
+                        UserName = EditUser.UserName,
+                        PwdHash = EditUser.PwdHash,
+                        Email = EditUser.Email,
+                        HomePhone = EditUser.HomePhone,
+                        OfficePhone = EditUser.OfficePhone,
+                        UpdatedBy = EditUser.UserName,
+                        Disable = EditUser.Disable,
+                        roleName = EditUser.roleName
+                    };
+                    string json = JsonConvert.SerializeObject(EditClass);
+
+                    streamWriter.Write(json);
+                }
+
+                HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
+                using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+                {
+                    responseOne = streamReader.ReadToEnd();
+                }
+                httpResponseCreateUser.Close();
+
+                string message = "";
+                if (responseOne.Equals("Username already exist"))
+                {
+                    message = "UserName does not exist";
+                }
+                else if (responseOne.Equals("UserInfo does not exist"))
+                {
+                    message = "UserInfo does not exist";
+                }
+
+                return RedirectToAction("GetAllUser", "Admin");
             }
-
-            HttpWebResponse httpResponseCreateUser = (HttpWebResponse)httpWebRequestCreateUser.GetResponse();
-            using (StreamReader streamReader = new StreamReader(httpResponseCreateUser.GetResponseStream()))
+            catch (System.Exception)
             {
-                responseOne = streamReader.ReadToEnd();
+                return View("Error");
+                throw;
             }
-            httpResponseCreateUser.Close();
-
-            string message = "";
-            if (responseOne.Equals("Username already exist"))
-            {
-                message = "UserName does not exist";
-            }
-            else if (responseOne.Equals("UserInfo does not exist"))
-            {
-                message = "UserInfo does not exist";
-            }
-
-            return RedirectToAction("GetAllUser", "Admin");
         }
 
         public IActionResult Logout()
@@ -418,7 +458,7 @@ namespace FWMS.Controllers
 
             return result;
         }
-        #endregion
+
         private List<Roles> RetrieveRoles()
         {
             string response = string.Empty;
@@ -468,7 +508,7 @@ namespace FWMS.Controllers
 
             return result;
         }
-
+        #endregion
 
     }
 }
