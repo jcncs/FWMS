@@ -17,26 +17,25 @@
                 </div>
                 @using (Html.BeginForm("CreateCollection", "Collections", FormMethod.Post))
                 {
-            <form>
-                <div class="form-group">
-                    <input class="form-control" placeholder="Collection Name" name="CollectionName" id="CollectionName">
-                </div>
-                <br />
-                <div class="form-group">
-                    @Html.TextBoxFor(model => model.CollectionDate, new { @class = "form-control", @type = "text", @placeholder = "Select Collection Date", @onfocus = "this.type='datetime-local'", @onblur = "if(this.value==='s')this.type='text'" })
-                </div>
-                <br />
-                <div class="form-group">
-                    @Html.DropDownListFor(m => m.donationId,
-                                     new SelectList(Model.DonationList, "donationId", "donationName"),
-                                     "Select Donation", new { @class = "form-control" })
-                </div>
-                <br />
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success col-12">Create Collection</button>
-                </div>
-                <br />
-            </form>
+                    <form>
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Collection Name" name="CollectionName" id="CollectionName">
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            @Html.TextBoxFor(model => model.CollectionDate, new { @class = "form-control", @type = "text", @placeholder = "Select Collection Date", @onfocus = "this.type='datetime-local'", @onblur = "if(this.value==='s')this.type='text'" })
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.donationId,
+                                             new SelectList(Model.DonationList, "donationId", "donationName"),
+                                             "Select Donation", new { @class = "form-control" })
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success col-12">Create Collection</button>
+                        </div>
+                    </form>
                 }
             </div>
         </div>

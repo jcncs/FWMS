@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Linq;
 
 namespace FWMS.Controllers
 {
@@ -33,26 +34,59 @@ namespace FWMS.Controllers
         {
             try
             {
-                string response = string.Empty;
-                var apiGateway = _configuration["ApiGateway"];
-                var viewCollectionss = _configuration["Collection:GET:GetAllCollections"];
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewCollectionss);
-                httpWebRequest.ContentType = "application/json; charset=utf-8";
-                httpWebRequest.Method = "GET";
-                httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                int currentrole = 0;
+                string currentusername = string.IsNullOrWhiteSpace(HttpContext.Session.GetString(USERNAME))? "": HttpContext.Session.GetString(USERNAME);
+                List<ViewDonationsModel> donationList = DonationList();
+                List<ViewCollectionsModel> collectionList = CollectionList();
+                List<ViewCollectionsModel> result = new List<ViewCollectionsModel>();
+
+                if (!string.IsNullOrWhiteSpace(HttpContext.Session.GetString(ROLE)))
                 {
-                    response = streamReader.ReadToEnd();
+                    currentrole = int.Parse(HttpContext.Session.GetString(ROLE));
+                    //Admin
+                    if (currentrole.Equals(1))
+                    {
+                        result = collectionList;
+                    }
+                    //Donor
+                    else if (currentrole.Equals(3))
+                    {
+                        //Collector based om CreatedBy -> username
+                         var query = (from ViewCollectionsModel in collectionList
+                                                               join ViewDonationsModel in donationList
+                                                               on ViewCollectionsModel.donationId equals ViewDonationsModel.donationId
+                                                               where ViewDonationsModel.createdBy.Equals(currentusername)
+                                                               select new ViewCollectionsModel {
+                                                                   collectionId = ViewCollectionsModel.collectionId,
+                                                                   collectionName = ViewCollectionsModel.collectionName,
+                                                                   collectionDate = ViewCollectionsModel.collectionDate,
+                                                                   donationId = ViewCollectionsModel.donationId
+                                                               });
+                        result = query.ToList();
+                    }
+                    //Collector
+                    else if (currentrole.Equals(4))
+                    {
+                        //Donor based on ReservedBy -> username
+                       var query  = (from ViewCollectionsModel in collectionList
+                                                               join ViewDonationsModel in donationList
+                                                               on ViewCollectionsModel.donationId equals ViewDonationsModel.donationId
+                                                               where ViewDonationsModel.reservedBy.Equals(currentusername)
+                                                               select new ViewCollectionsModel {
+                                                                   collectionId = ViewCollectionsModel.collectionId,
+                                                                   collectionName = ViewCollectionsModel.collectionName,
+                                                                   collectionDate = ViewCollectionsModel.collectionDate,
+                                                                   donationId = ViewCollectionsModel.donationId
+                                                               });
+                        result = query.ToList();
+                    }
                 }
-                httpResponse.Close();
-                List<ViewCollectionsModel> result = Deserialize<List<ViewCollectionsModel>>(response);
                 return View(result);
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                throw ex;
                 return View("Error");
-                throw;
             }
         }
 
@@ -64,10 +98,18 @@ namespace FWMS.Controllers
 
         public IActionResult CreateCollection()
         {
-            DonationsController donationsObj = new DonationsController(_donationlogger, _configuration);
-            CreateCollectionModel createCollectionModel = new CreateCollectionModel();
-            createCollectionModel.DonationList = donationsObj.DonationList();
-            return View(createCollectionModel);
+            try
+            {
+                CreateCollectionModel createCollectionModel = new CreateCollectionModel();
+                //expiry datetime < collection datetime --> 2 hours
+                createCollectionModel.DonationList = DonationList().Where(x => x.expiryDate > DateTime.Now.ToLocalTime().AddHours(-2) && string.IsNullOrWhiteSpace(x.reservedBy) && !(x.reservedDate.HasValue) && string.IsNullOrWhiteSpace(x.collectionId)).OrderByDescending(x => x.expiryDate).ToList();
+                return View(createCollectionModel);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+                return View("Error");
+            }
         }
 
         [HttpPost]
@@ -75,8 +117,8 @@ namespace FWMS.Controllers
         {
             try
             {
-                DonationsController donationsObj = new DonationsController(_donationlogger, _configuration);
-                model.DonationList = donationsObj.DonationList();
+                //expiry datetime < collection datetime --> 2 hours
+                model.DonationList = DonationList().Where(x => x.expiryDate > DateTime.Now.ToLocalTime().AddHours(-2) && string.IsNullOrWhiteSpace(x.reservedBy) && !(x.reservedDate.HasValue) && string.IsNullOrWhiteSpace(x.collectionId)).OrderByDescending(x => x.expiryDate).ToList();
 
                 if (ModelState.IsValid)
                 {
@@ -113,10 +155,10 @@ namespace FWMS.Controllers
                 }
                 return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Collections") : View(model);
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                throw ex;
                 return View("Error");
-                throw;
             }
         }
 
@@ -165,6 +207,32 @@ namespace FWMS.Controllers
             List<ViewFoodDescriptionsModel> result = Deserialize<List<ViewFoodDescriptionsModel>>(response);
             return result;
         }
-    #endregion
+        public List<ViewCollectionsModel> CollectionList()
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var viewCollectionss = _configuration["Collection:GET:GetAllCollections"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + viewCollectionss);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<ViewCollectionsModel> result = Deserialize<List<ViewCollectionsModel>>(response);
+            return result;
+        }
+
+        public List<ViewDonationsModel> DonationList()
+        {
+            DonationsController donationsObj = new DonationsController(_donationlogger, _configuration);
+            List<ViewDonationsModel> result = donationsObj.DonationList();
+
+            return result;
+        }
+        #endregion
     }
 }
