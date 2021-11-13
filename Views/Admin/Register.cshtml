@@ -31,23 +31,23 @@
             </div>
             <br />
             <div class="editor-field">
-                @Html.DropDownList("RoleDown", ViewBag.Roles as SelectList, "Select Role")
+                @Html.DropDownList("RoleDown", ViewBag.Roles as SelectList, "Select Role", new { @class = "form-control" })
             </div>
             <br />
             <div class="form-group">
                 @*<label asp-for="Password" class="control-label"></label>*@
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" placeholder="Password"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
                 @*<label asp-for="ConfirmPassword" class="control-label"></label>*@
-                <input asp-for="ConfirmPassword" class="form-control" />
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create My Account" class="btn btn-success col-12" />
             </div>
         </form>
     </div>
