@@ -34,15 +34,17 @@
                 @Html.DropDownList("RoleDown", ViewBag.Roles as SelectList, "Select Role", new { @class = "form-control" })
             </div>
             <br />
-            <div class="form-group">
+            <div class="form-group icon-div">
                 @*<label asp-for="Password" class="control-label"></label>*@
-                <input asp-for="Password" class="form-control" placeholder="Password"/>
+                <input asp-for="Password" class="form-control" placeholder="Password" id="pwdHash" />
+                <i onclick="show('pwdHash')" class="fas fa-eye-slash" id="display"></i>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <br />
-            <div class="form-group">
+            <div class="form-groups icon-div">
                 @*<label asp-for="ConfirmPassword" class="control-label"></label>*@
-                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" id="cmfHash" />
+                <i onclick="show('cmfHash')" class="fas fa-eye-slash" id="display"></i>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <br />
@@ -58,12 +60,19 @@
 
 }
 <script type="text/javascript">
-    function showPassword() {
-        var x = document.getElementById("pwdHash");
-        if (x.type === "password") {
-            x.type = "text";
+    function show(a) {
+        var x = document.getElementById(a);
+        var c = x.nextElementSibling
+        if (x.getAttribute('type') == "password") {
+            c.removeAttribute("class");
+            c.setAttribute("class", "fas fa-eye");
+            x.removeAttribute("type");
+            x.setAttribute("type", "text");
         } else {
-            x.type = "password";
+            x.removeAttribute("type");
+            x.setAttribute('type', 'password');
+            c.removeAttribute("class");
+            c.setAttribute("class", "fas fa-eye-slash");
         }
     }
 </script>

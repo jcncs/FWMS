@@ -40,8 +40,15 @@
                         <li class="nav-item">
                             <a class="nav-link navbar-text" asp-area="" asp-controller="Donations" asp-action="Index">DONATIONS</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link navbar-text" asp-area="" asp-controller="Collections" asp-action="Index">COLLECTIONS</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link navbar-text dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                COLLECTIONS
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Collections" asp-action="Index">View Collections</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Collections" asp-action="CreateCollection">Create Collection</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

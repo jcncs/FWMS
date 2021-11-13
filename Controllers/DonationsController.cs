@@ -31,20 +31,7 @@ namespace FWMS.Controllers
 
         public IActionResult Index()
         {
-            string response = string.Empty;
-            var apiGateway = _configuration["ApiGateway"];
-            var viewDonations = _configuration["Donation:GET:ViewDonations"];
-            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway+viewDonations);
-            httpWebRequest.ContentType = "application/json; charset=utf-8";
-            httpWebRequest.Method = "GET";
-            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-            {
-                response = streamReader.ReadToEnd();
-            }
-            httpResponse.Close();
-            List<ViewDonationsModel> result = Deserialize<List<ViewDonationsModel>>(response);
+            List<ViewDonationsModel> result = DonationList();
             return View(result);
         }
 
@@ -60,54 +47,62 @@ namespace FWMS.Controllers
         [HttpPost]
         public ActionResult CreateDonation(CreateDonationModel model)
         {
-            CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
-            model.LocationList = collectionsObj.LocationList();
-            model.FoodDescriptionList = collectionsObj.FoodDescriptionList();
-
-            if (ModelState.IsValid)
+            try
             {
-                int resultInt = 0;
-                if (!int.TryParse(model.Quantity, out resultInt))
+                CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
+                model.LocationList = collectionsObj.LocationList();
+                model.FoodDescriptionList = collectionsObj.FoodDescriptionList();
+
+                if (ModelState.IsValid)
                 {
-                    ViewBag.ErrorMessage = "Please enter a valid Quantity.";
-                    return View(model);
-                }
+                    int resultInt = 0;
+                    if (!int.TryParse(model.Quantity, out resultInt))
+                    {
+                        ViewBag.ErrorMessage = "Please enter a valid Quantity.";
+                        return View(model);
+                    }
 
-                string responseOne = string.Empty;
-                var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
-                var createDonation = _configuration.GetSection("Donation:POST:AddNewDonation").Get<string>();
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + createDonation);
-                httpWebRequest.ContentType = "application/json; charset=utf-8";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    string responseOne = string.Empty;
+                    var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                    var createDonation = _configuration.GetSection("Donation:POST:AddNewDonation").Get<string>();
+                    HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + createDonation);
+                    httpWebRequest.ContentType = "application/json; charset=utf-8";
+                    httpWebRequest.Method = "POST";
+                    httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    {
+                        CreateDonationModel cdM = new CreateDonationModel();
+                        cdM.DonationName = model.DonationName;
+                        cdM.Quantity = model.Quantity;
+                        cdM.ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1);
+                        cdM.CreatedBy = HttpContext.Session.GetString(USERNAME);
+                        cdM.LocationId = model.LocationId;
+                        cdM.FoodId = model.FoodId;
+                        cdM.UserId = HttpContext.Session.GetString(USERID);
+
+                        string json = JsonConvert.SerializeObject(cdM);
+
+                        streamWriter.Write(json);
+                    }
+
+                    HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    {
+                        responseOne = streamReader.ReadToEnd();
+                    }
+                    httpResponse.Close();
+                }
+                else
                 {
-                    CreateDonationModel cdM = new CreateDonationModel();
-                    cdM.DonationName = model.DonationName;
-                    cdM.Quantity = model.Quantity;
-                    cdM.ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1);
-                    cdM.CreatedBy = HttpContext.Session.GetString(USERNAME);
-                    cdM.LocationId = model.LocationId;
-                    cdM.FoodId = model.FoodId;
-                    cdM.UserId = HttpContext.Session.GetString(USERID);
-
-                    string json = JsonConvert.SerializeObject(cdM);
-
-                    streamWriter.Write(json);
+                    ViewBag.ErrorMessage = "Please enter all fields.";
                 }
-
-                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    responseOne = streamReader.ReadToEnd();
-                }
-                httpResponse.Close();
+                return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Donations") : View(model);
             }
-            else
+            catch (System.Exception)
             {
-                ViewBag.ErrorMessage = "Please enter all fields.";
+                return View("Error");
+                throw;
             }
-            return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Donations") : View(model);
         }
 
         public IActionResult EditDonation()
@@ -121,10 +116,30 @@ namespace FWMS.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        #region functions
         public static T Deserialize<T>(string jsonData)
         {
             JsonSerializer json = new JsonSerializer();
             return json.Deserialize<T>(new JsonTextReader(new StringReader(jsonData)));
         }
+        public List<ViewDonationsModel> DonationList()
+        {
+            string response = string.Empty;
+            var apiGateway = _configuration["ApiGateway"];
+            var viewDonations = _configuration["Donation:GET:ViewDonations"];
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + viewDonations);
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.Method = "GET";
+            httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                response = streamReader.ReadToEnd();
+            }
+            httpResponse.Close();
+            List<ViewDonationsModel> result = Deserialize<List<ViewDonationsModel>>(response);
+            return result;
+        }
+        #endregion
     }
 }

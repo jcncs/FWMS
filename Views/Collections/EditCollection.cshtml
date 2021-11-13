@@ -1,0 +1,39 @@
+﻿@model FWMS.Models.CreateCollectionModel
+
+<h4>UserProfileModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditUser">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="donationId" class="control-label"></label>
+                <input asp-for="donationId" class="form-control" />
+                <span asp-validation-for="donationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CollectionName" class="control-label"></label>
+                <input asp-for="CollectionName" class="form-control" />
+                <span asp-validation-for="CollectionName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReservedBy" class="control-label"></label>
+                <input asp-for="ReservedBy" class="form-control" />
+                <span asp-validation-for="ReservedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CollectionDate" class="control-label"></label>
+                <input asp-for="CollectionDate" class="form-control" />
+                <span asp-validation-for="CollectionDate" class="text-danger"></span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

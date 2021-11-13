@@ -186,10 +186,6 @@ namespace FWMS.Controllers
                 throw;
             }
         }
-        public IActionResult CreateNewAccount()
-        {
-            return View();
-        }
 
         public IActionResult Register()
 
@@ -204,8 +200,6 @@ namespace FWMS.Controllers
 
             //Create dropdown list
             ViewBag.Roles = new SelectList(DropDownRole, "RoleName", "RoleName");
-
-
 
             return View();
         }
