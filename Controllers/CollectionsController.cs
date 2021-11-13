@@ -93,7 +93,7 @@ namespace FWMS.Controllers
                         ccM.donationId = model.donationId;
                         ccM.CollectionName = model.CollectionName;
                         ccM.ReservedBy = HttpContext.Session.GetString(USERNAME);
-                        ccM.CollectionDate = DateTime.Now.ToLocalTime().AddDays(1);
+                        ccM.CollectionDate = model.CollectionDate;
 
                         string json = JsonConvert.SerializeObject(ccM);
 

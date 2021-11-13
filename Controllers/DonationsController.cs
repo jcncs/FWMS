@@ -74,7 +74,7 @@ namespace FWMS.Controllers
                         CreateDonationModel cdM = new CreateDonationModel();
                         cdM.DonationName = model.DonationName;
                         cdM.Quantity = model.Quantity;
-                        cdM.ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1);
+                        cdM.ExpiryDate = model.ExpiryDate;//DateTime.Now.ToLocalTime().AddDays(1);
                         cdM.CreatedBy = HttpContext.Session.GetString(USERNAME);
                         cdM.LocationId = model.LocationId;
                         cdM.FoodId = model.FoodId;

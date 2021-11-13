@@ -26,22 +26,21 @@
                             <input class="form-control" placeholder="Quantity" name="quantity" id="quantity">
                         </div>
                         <br />
-                        @*<div class="form-group">
-                                    <div class='input-group date' id='datetimepicker1'>
-                                        <input type='text' class="form-control" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            <br />*@
-                        @Html.DropDownListFor(m => m.LocationId,
-                                         new SelectList(Model.LocationList, "locationId", "locationName"),
-                                         "Select Pickup Location", new { @class = "form-control" })
+                        <div class="form-group">
+                            @Html.TextBoxFor(model => model.ExpiryDate, new { @class = "form-control", @type = "text", @placeholder = "Select Expiry Date", @onfocus = "this.type='datetime-local'", @onblur = "if(this.value==='s')this.type='text'" })
+                        </div>
                         <br />
-                        @Html.DropDownListFor(m => m.FoodId,
-                                         new SelectList(Model.FoodDescriptionList, "foodId", "description"),
-                                         "Select Food Type", new { @class = "form-control" })
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.LocationId,
+                                             new SelectList(Model.LocationList, "locationId", "locationName"),
+                                             "Select Pickup Location", new { @class = "form-control" })
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.FoodId,
+                                             new SelectList(Model.FoodDescriptionList, "foodId", "description"),
+                                             "Select Food Type", new { @class = "form-control" })
+                        </div>
                         <br />
                         <br />
                         <div class="form-group">
@@ -55,7 +54,16 @@
     </div>
 </div>
 <script type="text/javascript">
-    $(function () {
-        $('#datetimepicker1').datetimepicker();
+    $(function () { // will trigger when the document is ready
+        $('.datepicker').datepicker( //Initialise any datetime pickers
+            {
+                defaultDate: '@Model.ExpiryDate',
+                    showTodayButton: true,
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    showClose: true,
+                    showClear: true,
+                    toolbarPlacement: 'top',
+                    stepping: 15
+                });
     });
 </script>
