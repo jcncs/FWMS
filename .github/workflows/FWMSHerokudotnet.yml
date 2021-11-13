@@ -4,14 +4,17 @@ on:
   push:
     branches:
     - master
+  repository_dispatch:
 
 env:
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  APP_NAME: ${{ 'fwms-heroku' }}
+  STG_APP_NAME: ${{ 'fwms-stg' }}
+  PROD_APP_NAME: ${{ 'fwms-prod' }}
 
 jobs:
   build:
-    name: Deploy to Heroku
+    name: Deploy to fwms-stg for selenium testing
+    if: github.event.action != 'pong'
     runs-on: ubuntu-latest
     steps:
 
@@ -26,8 +29,8 @@ jobs:
     # Push the Docker image to Heroku Container Registry
     - name: Publish
       run: |
-        heroku container:push web -a $APP_NAME
-        heroku container:release web -a $APP_NAME
+        heroku container:push web -a $STG_APP_NAME
+        heroku container:release web -a $STG_APP_NAME
 
   ping:
     # Trigger repository dispatch 'ping' to FWMS_Tests
@@ -40,3 +43,24 @@ jobs:
         -H 'Accept: application/vnd.github.everest-preview+json' \
         -u ${{ secrets.FWMS_ACCESS_TOKEN }} \
         --data '{"event_type": "ping", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+        
+  ack:
+    name: ACK - Acknowledge successful pong from FWMS_Tests and deploy to fwms-prod
+    if: github.event.action == 'pong'
+    runs-on: ubuntu-latest
+    steps:
+
+    # Clone the repository
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Build Docker image
+    - name: Docker build
+      run: docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+
+    # Push the Docker image to Heroku Container Registry
+    - name: Publish to fwms-prod
+      run: |
+        echo "PONG received from '${{ github.event.client_payload.repository }}'" && \
+        heroku container:push web -a $PROD_APP_NAME
+        heroku container:release web -a $PROD_APP_NAME
