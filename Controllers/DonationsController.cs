@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Linq;
 using System;
 
 namespace FWMS.Controllers
@@ -31,17 +32,59 @@ namespace FWMS.Controllers
 
         public IActionResult Index()
         {
-            List<ViewDonationsModel> result = DonationList();
-            return View(result);
+            try
+            {
+                int currentrole = 0;
+                string currentusername = string.IsNullOrWhiteSpace(HttpContext.Session.GetString(USERNAME)) ? "" : HttpContext.Session.GetString(USERNAME);
+                List<ViewDonationsModel> result = new List<ViewDonationsModel>();
+
+                if (!string.IsNullOrWhiteSpace(HttpContext.Session.GetString(ROLE)))
+                {
+                    currentrole = int.Parse(HttpContext.Session.GetString(ROLE));
+                    //Admin
+                    if (currentrole.Equals(1))
+                    {
+                        //View everything
+                        result = (List<ViewDonationsModel>)DonationList().OrderByDescending(x => x.createdDate).ToList();
+                    }
+                    //Donor
+                    else if (currentrole.Equals(3))
+                    {
+                        //Only view the donation created by themselves
+                        result = (List<ViewDonationsModel>)DonationList().Where(x => x.createdBy == currentusername).OrderByDescending(x => x.createdDate).ToList();
+
+                    }
+                    //Collector
+                    else if (currentrole.Equals(4))
+                    {
+                        //expiry datetime < collection datetime --> 2 hours
+                        result = (List<ViewDonationsModel>)DonationList().Where(x => x.expiryDate > DateTime.Now.ToLocalTime().AddHours(-2)).OrderByDescending(x => x.expiryDate).ToList();
+                    }
+                }
+                return View(result);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+                return View("Error");
+            }
         }
 
         public IActionResult CreateDonation()
         {
-            CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
-            CreateDonationModel createDonationModel = new CreateDonationModel();
-            createDonationModel.LocationList = collectionsObj.LocationList();
-            createDonationModel.FoodDescriptionList = collectionsObj.FoodDescriptionList();
-            return View(createDonationModel);
+            try
+            {
+                CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
+                CreateDonationModel createDonationModel = new CreateDonationModel();
+                createDonationModel.LocationList = collectionsObj.LocationList();
+                createDonationModel.FoodDescriptionList = collectionsObj.FoodDescriptionList();
+                return View(createDonationModel);
+            }
+            catch (System.Exception ex)
+            {
+                throw ex;
+                return View("Error");
+            }
         }
 
         [HttpPost]
@@ -74,7 +117,7 @@ namespace FWMS.Controllers
                         CreateDonationModel cdM = new CreateDonationModel();
                         cdM.DonationName = model.DonationName;
                         cdM.Quantity = model.Quantity;
-                        cdM.ExpiryDate = DateTime.Now.ToLocalTime().AddDays(1);
+                        cdM.ExpiryDate = model.ExpiryDate;//DateTime.Now.ToLocalTime().AddDays(1);
                         cdM.CreatedBy = HttpContext.Session.GetString(USERNAME);
                         cdM.LocationId = model.LocationId;
                         cdM.FoodId = model.FoodId;
@@ -98,10 +141,10 @@ namespace FWMS.Controllers
                 }
                 return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Donations") : View(model);
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                throw ex;
                 return View("Error");
-                throw;
             }
         }
 

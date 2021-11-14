@@ -18,6 +18,9 @@ namespace FWMS.Models
         [Required]
         public string Quantity { get; set; }
 
+        [Required]
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}", ApplyFormatInEditMode = true)]
         public DateTime? ExpiryDate { get; set; }
 
         public string CreatedBy { get; set; }

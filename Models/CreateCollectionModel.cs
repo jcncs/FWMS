@@ -21,8 +21,11 @@ namespace FWMS.Models
         [DisplayName("Reserve By")]
         public string ReservedBy { get; set; }
 
+        [Required]
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}", ApplyFormatInEditMode = true)]
         [DisplayName("Collection Date")]
-        public DateTime CollectionDate { get; set; }
+        public DateTime? CollectionDate { get; set; }
         public List<ViewDonationsModel> DonationList { get; set; }
     }
 }
