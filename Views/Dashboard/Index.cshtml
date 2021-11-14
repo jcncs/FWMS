@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
     @model List<ViewDashboardModel>;
+    int sno = 1;
 }
 
 <div class="text-center">
@@ -33,107 +34,71 @@
             <div class="card-header bg-dark text-white"><h1 class="display-6 my-auto" style="font-size: 26px !important"><b>Available Donations</b></h1></div>
             @if (Model.Count() > 0)
             {
-                <div class="row">
-                    @foreach (var item in Model.OrderByDescending(e => e.createdDate))
-                    {
-                        <div class="col">
-
-                            <div class="card" style="width: 18.6rem;">
-                                <img src="/Image/donation-icon.png" class="card-img-top mx-auto mt-3" style="width: 100px; height: 100px;" alt="donation">
-                                <div class="card-body">
-                                    <h5 class="card-title">@item.donationName</h5>
-                                    <p class="card-text">@item.locationName</p>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Category</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.category</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Desc.</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.description</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Quantity</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.quantity</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Exp. Dt</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.expiryDate</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    @*<li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Created By</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.createdBy</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Created Dt</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.createdDate</label>
-                                            </div>
-                                        </div>
-                                    </li>*@
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Reserved By</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.reservedBy</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Reserved Dt</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.reservedDate</label>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div class="card-body">
-                                    <a href="#" class="btn btn-danger">Remove</a>
+                <table class="table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>
+                                S/N
+                            </th>
+                            <th>
+                                Donation Name
+                            </th>
+                            <th>
+                                Location Name
+                            </th>
+                            <th>
+                                Category
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Expiry Date
+                            </th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @sno
+                                    @{sno++;}
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.donationName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.locationName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.category)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.expiryDate)
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-danger">Cancel</a>
+                                </td>
+                                <td>
                                     <a href="#" class="btn btn-success">Reserve</a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
             }
             else
             {
