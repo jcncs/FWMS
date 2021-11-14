@@ -86,25 +86,25 @@
                                         </div>
                                     </li>
                                     @*<li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Created By</b></label>
+                                            <div class="row">
+                                                <div class="col-lg-5 col-5">
+                                                    <label for=""><b>Created By</b></label>
+                                                </div>
+                                                <div class="col-lg-7 col-7">
+                                                    <label for="">@item.createdBy</label>
+                                                </div>
                                             </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.createdBy</label>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-lg-5 col-5">
+                                                    <label for=""><b>Created Dt</b></label>
+                                                </div>
+                                                <div class="col-lg-7 col-7">
+                                                    <label for="">@item.createdDate</label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-lg-5 col-5">
-                                                <label for=""><b>Created Dt</b></label>
-                                            </div>
-                                            <div class="col-lg-7 col-7">
-                                                <label for="">@item.createdDate</label>
-                                            </div>
-                                        </div>
-                                    </li>*@
+                                        </li>*@
                                     <li class="list-group-item">
                                         <div class="row">
                                             <div class="col-lg-5 col-5">
@@ -127,7 +127,10 @@
                                     </li>
                                 </ul>
                                 <div class="card-body">
-                                    <a href="#" class="btn btn-danger">Remove</a>
+                                    <form asp-action="CancelDonation" asp-controller="Donations" id=@item.donationId method="post">
+                                        <input type="hidden" name="DonationId" value="@item.donationId" />
+                                            <input type="submit" class="btn btn-danger" value="Cancel" />
+                                    </form>
                                     <a href="#" class="btn btn-success">Reserve</a>
                                 </div>
                             </div>

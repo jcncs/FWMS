@@ -110,6 +110,61 @@ namespace FWMS.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult CancelDonation(CancelDonationModel model)
+        {
+            try
+            {
+                CollectionsController collectionsObj = new CollectionsController(_collectionlogger, _configuration);
+
+                if (ModelState.IsValid)
+                {
+                    if (!string.IsNullOrEmpty(model.DonationId))
+                    {
+                        string responseOne = string.Empty;
+                        var apiGateway = _configuration.GetSection("ApiGateway").Get<string>();
+                        var createDonation = _configuration.GetSection("Donation:PUT:CancelDonation").Get<string>();
+                        HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(apiGateway + createDonation);
+                        httpWebRequest.ContentType = "application/json; charset=utf-8";
+                        httpWebRequest.Method = "PUT";
+                        httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                        using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                        {
+                            CancelDonationModel cdM = new CancelDonationModel();
+                            cdM.DonationId = model.DonationId;
+
+                            string json = JsonConvert.SerializeObject(cdM);
+
+                            streamWriter.Write(json);
+                        }
+
+                        List<ViewDonationsModel> result = DonationList();
+                        return View("Index", result);
+                        //HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                        //using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                        //{
+                        //    responseOne = streamReader.ReadToEnd();
+                        //}
+                        //httpResponse.Close();
+                    }
+                    else
+                    {
+                        return View("Error");
+                    }
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Please enter all fields.";
+                }
+                return ViewBag.ErrorMessage == null ? RedirectToAction("Index", "Dashboard") : View();
+            }
+            catch (System.Exception)
+            {
+                return View("Error");
+                throw;
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
