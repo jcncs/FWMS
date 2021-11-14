@@ -57,8 +57,7 @@ namespace FWMS.Controllers
                     //Collector
                     else if (currentrole.Equals(4))
                     {
-                        //expiry datetime < collection datetime --> 2 hours
-                        result = (List<ViewDonationsModel>)DonationList().Where(x => x.expiryDate > DateTime.Now.ToLocalTime().AddHours(-2)).OrderByDescending(x => x.expiryDate).ToList();
+                        result = (List<ViewDonationsModel>)DonationList().OrderByDescending(x => x.expiryDate).ToList();
                     }
                 }
                 return View(result);
