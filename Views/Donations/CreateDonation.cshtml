@@ -27,7 +27,7 @@
                         </div>
                         <br />
                         <div class="form-group">
-                            @Html.TextBoxFor(model => model.ExpiryDate, new { @class = "form-control", @type = "text", @placeholder = "Select Expiry Date", @onfocus = "this.type='date'", @onblur = "if(this.value==='s')this.type='text'" })
+                            @Html.TextBoxFor(model => model.ExpiryDate, new { @class = "form-control", @type = "text", @placeholder = "Select Expiry Date", @onblur = "if(this.value==='s')this.type='text'" })
                         </div>
                         @*<div class="form-group">
                                 @Html.TextBoxFor(model => model.ExpiryDate, new { @class = "form-control", @type = "text", @placeholder = "Select Expiry Date", @onfocus = "this.type='datetime-local'", @onblur = "if(this.value==='s')this.type='text'" })
